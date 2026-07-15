@@ -231,6 +231,22 @@
     color:var(--ink);
   }
   .week-card p{ margin:0; font-size:13px; color:var(--ink-soft); line-height:1.5; }
+  .week-card.clickable{ cursor:pointer; transition:box-shadow 0.15s ease, border-color 0.15s ease; }
+  .week-card.clickable:hover{ border-color:var(--gold); box-shadow:0 1px 2px rgba(28,43,34,0.08), 0 6px 20px rgba(28,43,34,0.1); }
+  .overview-edit-actions{ display:flex; gap:10px; margin-top:6px; }
+  .week-card .edit-field{ display:flex; flex-direction:column; gap:6px; }
+  .week-card input[type=text].title-input{ font-family:'Fraunces',serif; font-size:16px; font-weight:600; width:100%; }
+  .week-card textarea.desc-input{ font-family:'Inter',sans-serif; font-size:13px; width:100%; min-width:0; min-height:52px; }
+  .week-card .slides-badge{
+    display:inline-flex; align-items:center; gap:5px; margin-top:8px;
+    font-family:'IBM Plex Mono',monospace; font-size:11px; font-weight:600;
+    color:var(--forest);
+  }
+  .back{
+    background:none; border:none; color:var(--ink-soft); font-size:13px; cursor:pointer;
+    padding:4px 0; margin-bottom:14px; display:flex; align-items:center; gap:4px;
+  }
+  .back:hover{ color:var(--forest); }
 
   /* ---------- shared components ---------- */
   .panel{
@@ -364,6 +380,26 @@
   .resource-item a:hover{ text-decoration:underline; }
   .resource-item .note{ font-size:12.5px; color:var(--ink-soft); margin-top:3px; }
 
+  .slides-deck{
+    background:var(--panel); border:1px solid var(--line-soft); border-radius:var(--radius);
+    padding:16px; box-shadow:var(--shadow); margin-bottom:16px;
+    display:flex; gap:14px;
+  }
+  .slides-deck-body{ flex:1; min-width:0; }
+  .slides-deck-head{ display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:10px; }
+  .slides-deck-head h4{ font-family:'Fraunces',serif; font-size:15px; font-weight:600; margin:0; }
+  .slides-deck-actions{ display:flex; gap:8px; flex-shrink:0; }
+  .slides-deck iframe{ width:100%; aspect-ratio:16/9; border:1px solid var(--line); border-radius:8px; display:block; }
+  .slides-deck iframe.generic-embed{ width:320px; max-width:100%; aspect-ratio:4/3; }
+  .slides-deck iframe:fullscreen{ aspect-ratio:auto; }
+  .slides-order-actions{ margin-bottom:14px; }
+  .reorder-controls{ display:flex; flex-direction:column; gap:4px; flex-shrink:0; }
+  .reorder-controls button{
+    width:26px; height:22px; border-radius:5px; border:1px solid var(--line);
+    background:#fff; color:var(--forest); cursor:pointer; font-size:11px; line-height:1;
+  }
+  .reorder-controls button:disabled{ opacity:0.3; cursor:default; }
+
   .week-select-row{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px; }
   .week-chip{
     font-family:'IBM Plex Mono',monospace;
@@ -439,6 +475,7 @@
       </div>
       <div class="stat-row" id="overviewStats"></div>
       <div class="timeline" id="timeline"></div>
+      <div class="overview-edit-actions" id="overviewEditActions"></div>
     </section>
 
     <!-- ROSTER -->
@@ -565,6 +602,32 @@
         <div id="resourceList" style="margin-top:16px;"></div>
       </div>
     </section>
+
+    <!-- WEEK DETAIL -->
+    <section class="view" id="view-week-detail">
+      <button class="back" id="backToOverview">← Back to overview</button>
+      <div class="view-head">
+        <p class="eyebrow" id="weekDetailEyebrow">Week</p>
+        <h2 id="weekDetailTitle"></h2>
+        <p id="weekDetailDesc"></p>
+      </div>
+      <div class="panel">
+        <h3>Add a Slidedeck, Webpage, or Program Link</h3>
+        <div class="form-row">
+          <div class="field">
+            <label for="weekSlidesTitle">Title</label>
+            <input type="text" id="weekSlidesTitle" placeholder="e.g. Gradebook walkthrough">
+          </div>
+          <div class="field" style="flex:1;">
+            <label for="weekSlidesUrl">Slides link</label>
+            <input type="url" id="weekSlidesUrl" placeholder="https://…">
+          </div>
+          <button class="btn" id="addSlidesBtn">Add</button>
+        </div>
+      </div>
+      <div class="slides-order-actions" id="weekSlidesOrderActions"></div>
+      <div id="weekSlidesList"></div>
+    </section>
   </main>
 </div>
 
@@ -600,20 +663,24 @@
   let pairings = [];
   let resourcesByWeek = {};
   let responsesByWeek = {};
+  let weekSlides = {};
   let pulseSelectedWeek = 1;
   let resourceSelectedWeek = 1;
   let qrSelectedStyle = STYLES[0].key;
+  let weekDetailSelected = 1;
 
   WEEKS.forEach(w=>{ resourcesByWeek[w.n] = []; responsesByWeek[w.n] = []; });
 
   async function loadAll(){
     setSaveStatus('Loading…');
-    const [teachersRes, attendanceRes, pairingsRes, resourcesRes, responsesRes] = await Promise.all([
+    const [teachersRes, attendanceRes, pairingsRes, resourcesRes, responsesRes, slidesRes, weekContentRes] = await Promise.all([
       sb.from('teachers').select('*').order('created_at'),
       sb.from('attendance').select('*'),
       sb.from('mentor_pairings').select('*').order('created_at'),
       sb.from('resources').select('*').order('created_at'),
-      sb.from('warmup_responses').select('*').order('created_at', { ascending:false })
+      sb.from('warmup_responses').select('*').order('created_at', { ascending:false }),
+      sb.from('week_slides').select('*').order('sort_order'),
+      sb.from('week_content').select('*')
     ]);
 
     teachers = teachersRes.data || [];
@@ -631,6 +698,15 @@
 
     WEEKS.forEach(w=>{ responsesByWeek[w.n] = []; });
     (responsesRes.data || []).forEach(r=>{ if(responsesByWeek[r.week]) responsesByWeek[r.week].push(r); });
+
+    weekSlides = {};
+    WEEKS.forEach(w=>{ weekSlides[w.n] = []; });
+    (slidesRes.data || []).forEach(s=>{ if(weekSlides[s.week]) weekSlides[s.week].push(s); });
+
+    (weekContentRes.data || []).forEach(c=>{
+      const w = WEEKS.find(w=>w.n===c.week);
+      if(w){ w.title = c.title; w.desc = c.description; }
+    });
 
     setSaveStatus('Synced');
   }
@@ -652,14 +728,176 @@
   }
 
   // ---------- Navigation ----------
+  function showView(id){
+    document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+    const navBtn = document.querySelector('.nav-btn[data-view="'+id+'"]');
+    if(navBtn) navBtn.classList.add('active');
+    document.getElementById('view-'+id).classList.add('active');
+  }
+
   document.querySelectorAll('.nav-btn').forEach(btn=>{
     btn.addEventListener('click', ()=>{
-      document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
-      document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
-      btn.classList.add('active');
-      document.getElementById('view-'+btn.dataset.view).classList.add('active');
+      if(location.hash) location.hash = '';
+      showView(btn.dataset.view);
     });
   });
+
+  document.getElementById('backToOverview').addEventListener('click', ()=>{
+    location.hash = '';
+  });
+
+  let slidesReorderMode = false;
+
+  function openWeekDetail(n){
+    const w = WEEKS.find(w=>w.n===n);
+    if(!w) return;
+    weekDetailSelected = n;
+    slidesReorderMode = false;
+    document.getElementById('weekDetailEyebrow').textContent = 'Week ' + n;
+    document.getElementById('weekDetailTitle').textContent = w.title;
+    document.getElementById('weekDetailDesc').textContent = w.desc;
+    document.getElementById('weekSlidesTitle').value = '';
+    document.getElementById('weekSlidesUrl').value = '';
+    renderWeekSlidesOrderActions();
+    renderWeekSlidesList();
+    showView('week-detail');
+  }
+
+  function renderWeekSlidesOrderActions(){
+    const wrap = document.getElementById('weekSlidesOrderActions');
+    const decks = weekSlides[weekDetailSelected] || [];
+    if(decks.length < 2){ wrap.innerHTML = ''; return; }
+    wrap.innerHTML = slidesReorderMode
+      ? '<button class="btn ghost" id="doneOrderBtn">Done ordering</button>'
+      : '<button class="btn ghost" id="changeOrderBtn">Change order</button>';
+    if(slidesReorderMode){
+      document.getElementById('doneOrderBtn').addEventListener('click', ()=>{
+        slidesReorderMode = false;
+        renderWeekSlidesOrderActions();
+        renderWeekSlidesList();
+      });
+    } else {
+      document.getElementById('changeOrderBtn').addEventListener('click', ()=>{
+        slidesReorderMode = true;
+        renderWeekSlidesOrderActions();
+        renderWeekSlidesList();
+      });
+    }
+  }
+
+  async function moveDeck(id, direction){
+    const decks = weekSlides[weekDetailSelected];
+    const i = decks.findIndex(d=>d.id===id);
+    const j = i + direction;
+    if(i<0 || j<0 || j>=decks.length) return;
+    const a = decks[i], b = decks[j];
+    const aOrder = a.sort_order, bOrder = b.sort_order;
+    setSaveStatus('Saving…');
+    const { error } = await sb.from('week_slides').upsert([
+      { id: a.id, week: a.week, title: a.title, url: a.url, sort_order: bOrder },
+      { id: b.id, week: b.week, title: b.title, url: b.url, sort_order: aOrder }
+    ]);
+    if(error){ console.error(error); setSaveStatus('Save failed'); return; }
+    a.sort_order = bOrder; b.sort_order = aOrder;
+    decks.sort((x,y)=>x.sort_order-y.sort_order);
+    setSaveStatus('Synced');
+    renderWeekSlidesList();
+  }
+
+  function slidesEmbedUrl(url){
+    const m = url && url.match(/\/presentation\/d\/([a-zA-Z0-9_-]+)/);
+    return m ? 'https://docs.google.com/presentation/d/' + m[1] + '/embed?start=false&loop=false&delayms=3000' : null;
+  }
+
+  function renderWeekSlidesList(){
+    const wrap = document.getElementById('weekSlidesList');
+    const decks = weekSlides[weekDetailSelected] || [];
+    if(decks.length===0){
+      wrap.innerHTML = '<div class="empty">No links added for this week yet.</div>';
+      return;
+    }
+    wrap.innerHTML = decks.map((d,idx)=>{
+      const knownEmbed = slidesEmbedUrl(d.url);
+      const embed = knownEmbed || d.url;
+      const reorder = slidesReorderMode
+        ? `<div class="reorder-controls">
+             <button data-move-up="${d.id}" ${idx===0 ? 'disabled' : ''}>▲</button>
+             <button data-move-down="${d.id}" ${idx===decks.length-1 ? 'disabled' : ''}>▼</button>
+           </div>`
+        : '';
+      return `<div class="slides-deck">
+        ${reorder}
+        <div class="slides-deck-body">
+          <div class="slides-deck-head">
+            <h4>${escapeHtml(d.title)}</h4>
+            <div class="slides-deck-actions">
+              <a class="btn ghost" href="${escapeAttr(d.url)}" target="_blank" rel="noopener">Open ↗</a>
+              <button class="btn ghost" data-expand-deck="${d.id}">Expand ⤢</button>
+              <button class="btn ghost" data-remove-deck="${d.id}">Remove</button>
+            </div>
+          </div>
+          <iframe id="deck-iframe-${d.id}" class="${knownEmbed ? '' : 'generic-embed'}" src="${escapeAttr(embed)}" allow="fullscreen" allowfullscreen></iframe>
+          <p style="font-size:11.5px; color:var(--ink-soft); margin:8px 0 0 0;">If the preview above is blank, that site doesn't allow embedding — use "Open" instead.</p>
+        </div>
+      </div>`;
+    }).join('');
+
+    wrap.querySelectorAll('[data-move-up]').forEach(b=>{
+      b.addEventListener('click', ()=> moveDeck(b.dataset.moveUp, -1));
+    });
+    wrap.querySelectorAll('[data-move-down]').forEach(b=>{
+      b.addEventListener('click', ()=> moveDeck(b.dataset.moveDown, 1));
+    });
+    wrap.querySelectorAll('[data-expand-deck]').forEach(b=>{
+      b.addEventListener('click', ()=>{
+        const iframe = document.getElementById('deck-iframe-'+b.dataset.expandDeck);
+        if(iframe && iframe.requestFullscreen) iframe.requestFullscreen().catch(err=>console.error('Fullscreen request failed', err));
+      });
+    });
+    wrap.querySelectorAll('[data-remove-deck]').forEach(b=>{
+      b.addEventListener('click', async ()=>{
+        const id = b.dataset.removeDeck;
+        const { error } = await sb.from('week_slides').delete().eq('id', id);
+        if(error){ console.error(error); setSaveStatus('Save failed'); return; }
+        weekSlides[weekDetailSelected] = weekSlides[weekDetailSelected].filter(d=>d.id!==id);
+        setSaveStatus('Synced');
+        renderWeekSlidesOrderActions();
+        renderWeekSlidesList();
+        renderOverview();
+      });
+    });
+  }
+
+  document.getElementById('addSlidesBtn').addEventListener('click', async ()=>{
+    const titleEl = document.getElementById('weekSlidesTitle');
+    const urlEl = document.getElementById('weekSlidesUrl');
+    const title = titleEl.value.trim();
+    const url = urlEl.value.trim();
+    if(!title || !url) return;
+    setSaveStatus('Saving…');
+    const nextOrder = weekSlides[weekDetailSelected].length
+      ? Math.max(...weekSlides[weekDetailSelected].map(d=>d.sort_order)) + 1
+      : 1;
+    const { data, error } = await sb.from('week_slides').insert({ week: weekDetailSelected, title, url, sort_order: nextOrder }).select().single();
+    if(error){ console.error(error); setSaveStatus('Save failed'); return; }
+    weekSlides[weekDetailSelected].push(data);
+    titleEl.value = ''; urlEl.value = '';
+    setSaveStatus('Synced');
+    renderWeekSlidesOrderActions();
+    renderWeekSlidesList();
+    renderOverview();
+  });
+
+  function routeFromHash(){
+    const m = location.hash.match(/^#week\/(\d)$/);
+    if(m && Number(m[1])>=1 && Number(m[1])<=8){
+      openWeekDetail(Number(m[1]));
+    } else {
+      showView('overview');
+    }
+  }
+  window.addEventListener('hashchange', routeFromHash);
 
   // ---------- Overview ----------
   function renderOverview(){
@@ -681,15 +919,71 @@
       <div class="stat-card"><div class="num">${totalPairings}</div><div class="lbl">Mentor pairings</div></div>
     `;
 
-    document.getElementById('timeline').innerHTML = WEEKS.map(w=>`
-      <div class="week-node">
+    document.getElementById('timeline').innerHTML = WEEKS.map(w=>{
+      const badge = weekSlides[w.n] && weekSlides[w.n].length ? `<div class="slides-badge">🔗 ${weekSlides[w.n].length} deck${weekSlides[w.n].length>1?'s':''} linked</div>` : '';
+      const body = overviewEditMode
+        ? `<div class="edit-field">
+             <input type="text" class="title-input" data-week-title="${w.n}" value="${escapeAttr(w.title)}">
+             <textarea class="desc-input" data-week-desc="${w.n}">${escapeHtml(w.desc)}</textarea>
+           </div>`
+        : `<h3>${escapeHtml(w.title)}</h3><p>${escapeHtml(w.desc)}</p>${badge}`;
+      return `<div class="week-node">
         <div class="week-ring">${w.n}</div>
-        <div class="week-card">
-          <h3>${w.title}</h3>
-          <p>${w.desc}</p>
+        <div class="week-card${overviewEditMode ? '' : ' clickable'}" ${overviewEditMode ? '' : `data-week-open="${w.n}"`}>
+          ${body}
         </div>
-      </div>
-    `).join('');
+      </div>`;
+    }).join('');
+
+    if(!overviewEditMode){
+      document.querySelectorAll('[data-week-open]').forEach(card=>{
+        card.addEventListener('click', ()=>{
+          location.hash = 'week/' + card.dataset.weekOpen;
+        });
+      });
+    }
+  }
+
+  let overviewEditMode = false;
+
+  function renderOverviewEditActions(){
+    const wrap = document.getElementById('overviewEditActions');
+    wrap.innerHTML = overviewEditMode
+      ? '<button class="btn" id="saveWeeksBtn">Save changes</button><button class="btn ghost" id="cancelWeeksBtn">Cancel</button>'
+      : '<button class="btn ghost" id="editWeeksBtn">Edit weeks</button>';
+
+    if(overviewEditMode){
+      document.getElementById('saveWeeksBtn').addEventListener('click', async ()=>{
+        const updates = WEEKS.map(w=>({
+          week: w.n,
+          title: document.querySelector(`[data-week-title="${w.n}"]`).value.trim() || w.title,
+          description: document.querySelector(`[data-week-desc="${w.n}"]`).value.trim() || w.desc
+        }));
+        setSaveStatus('Saving…');
+        const { error } = await sb.from('week_content').upsert(updates);
+        if(error){ console.error(error); setSaveStatus('Save failed'); return; }
+        updates.forEach(u=>{
+          const w = WEEKS.find(w=>w.n===u.week);
+          w.title = u.title; w.desc = u.description;
+        });
+        setSaveStatus('Synced');
+        overviewEditMode = false;
+        renderOverviewEditActions();
+        renderOverview();
+        renderResourceChips();
+      });
+      document.getElementById('cancelWeeksBtn').addEventListener('click', ()=>{
+        overviewEditMode = false;
+        renderOverviewEditActions();
+        renderOverview();
+      });
+    } else {
+      document.getElementById('editWeeksBtn').addEventListener('click', ()=>{
+        overviewEditMode = true;
+        renderOverviewEditActions();
+        renderOverview();
+      });
+    }
   }
 
   // ---------- Roster ----------
@@ -984,6 +1278,7 @@
 
   function renderAll(){
     renderOverview();
+    renderOverviewEditActions();
     renderRoster();
     renderPulseChips();
     renderPulseStyleSelect();
@@ -999,6 +1294,7 @@
   (async function init(){
     await loadAll();
     renderAll();
+    routeFromHash();
   })();
 })();
 </script>
