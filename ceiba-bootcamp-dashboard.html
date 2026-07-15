@@ -7,6 +7,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 <style>
   :root{
     --ink:#1C2B22;
@@ -471,32 +473,31 @@
       <div class="view-head">
         <p class="eyebrow">After every session</p>
         <h2>Pulse checks</h2>
-        <p>A quick, low-friction way to see how confident new teachers feel each week — feed the trend straight into the Week Eight reflection.</p>
+        <p>Live warm-up responses submitted by new teachers, straight from the warm-up page.</p>
       </div>
       <div class="panel">
-        <h3>Confidence trend, all weeks</h3>
+        <h3>Responses logged, all weeks</h3>
         <div class="pulse-bars" id="pulseTrend"></div>
       </div>
       <div class="panel">
-        <h3>Log a pulse check</h3>
+        <h3>Send this week's warm-up</h3>
         <div class="week-select-row" id="pulseWeekChips"></div>
         <div class="form-row">
-          <div class="field">
-            <label for="pulseRating">Confidence (1–5)</label>
-            <select id="pulseRating">
-              <option value="1">1 — Still lost</option>
-              <option value="2">2 — Shaky</option>
-              <option value="3" selected>3 — Getting there</option>
-              <option value="4">4 — Solid</option>
-              <option value="5">5 — Confident</option>
-            </select>
-          </div>
           <div class="field" style="flex:1;">
-            <label for="pulseNote">Note (optional)</label>
-            <textarea id="pulseNote" placeholder="What's still unclear? What clicked?"></textarea>
+            <label for="pulseStyle">Warm-up style</label>
+            <select id="pulseStyle"></select>
           </div>
-          <button class="btn" id="addPulseBtn">Add entry</button>
         </div>
+        <div id="qrWrap" style="display:flex; align-items:center; gap:18px; margin-top:14px; flex-wrap:wrap;">
+          <div id="qrCanvas" style="border-radius:10px; border:1px solid var(--line); width:140px; height:140px; overflow:hidden;"></div>
+          <div style="font-size:12.5px; color:var(--ink-soft); word-break:break-all; max-width:340px;">
+            Scan to open the warm-up, pre-set to this week and style.
+            <div id="qrLink" style="margin-top:6px; font-family:'IBM Plex Mono',monospace; font-size:11.5px;"></div>
+          </div>
+        </div>
+      </div>
+      <div class="panel">
+        <h3>Responses for this week</h3>
         <div class="entry-list" id="pulseEntries"></div>
       </div>
     </section>
@@ -569,7 +570,10 @@
 
 <script>
 (function(){
-  const STORAGE_KEY = 'ceiba-bootcamp-v1';
+  const SUPABASE_URL = 'https://zmhmtxvlnmzivovndytu.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_gm6MQEblN5UMdfRBbiuBVA_3MJZRYha';
+  const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  const TEACHER_PAGE_URL = 'https://teacher-boot-camp.vercel.app/';
 
   const WEEKS = [
     { n:1, title:"Welcome and Orientation", desc:"Campus tour, introductions to key staff, logistics like schedules, copiers, and technology access." },
@@ -582,51 +586,65 @@
     { n:8, title:"Reflection and Peer Share", desc:"New teachers share wins and struggles, feedback on the boot camp itself, and planning next steps." }
   ];
 
-  function defaultState(){
-    const pulse = {}, resources = {};
-    WEEKS.forEach(w => { pulse[w.n] = []; resources[w.n] = []; });
-    return { teachers: [], attendance: {}, pulse, resources, pairings: [] };
-  }
+  const STYLES = [
+    { key:'one_word', name:'One word check-in' },
+    { key:'weather', name:'Weather report' },
+    { key:'this_or_that', name:'This or that' },
+    { key:'muddiest_point', name:'Muddiest point' },
+    { key:'rose_thorn_bud', name:'Rose / Thorn / Bud' },
+    { key:'ask_anything', name:'Ask me anything' }
+  ];
 
-  let state = defaultState();
+  let teachers = [];
+  let attendanceMap = {};
+  let pairings = [];
+  let resourcesByWeek = {};
+  let responsesByWeek = {};
   let pulseSelectedWeek = 1;
   let resourceSelectedWeek = 1;
-  let saveTimer = null;
+  let qrSelectedStyle = STYLES[0].key;
 
-  function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+  WEEKS.forEach(w=>{ resourcesByWeek[w.n] = []; responsesByWeek[w.n] = []; });
 
-  async function loadState(){
-    try{
-      const res = await window.storage.get(STORAGE_KEY, false);
-      if(res && res.value){
-        const parsed = JSON.parse(res.value);
-        state = Object.assign(defaultState(), parsed);
-        WEEKS.forEach(w=>{
-          if(!state.pulse[w.n]) state.pulse[w.n] = [];
-          if(!state.resources[w.n]) state.resources[w.n] = [];
-        });
-      }
-    }catch(e){
-      // no saved data yet — start fresh
-    }
-    setSaveStatus('Loaded');
+  async function loadAll(){
+    setSaveStatus('Loading…');
+    const [teachersRes, attendanceRes, pairingsRes, resourcesRes, responsesRes] = await Promise.all([
+      sb.from('teachers').select('*').order('created_at'),
+      sb.from('attendance').select('*'),
+      sb.from('mentor_pairings').select('*').order('created_at'),
+      sb.from('resources').select('*').order('created_at'),
+      sb.from('warmup_responses').select('*').order('created_at', { ascending:false })
+    ]);
+
+    teachers = teachersRes.data || [];
+
+    attendanceMap = {};
+    (attendanceRes.data || []).forEach(a=>{
+      if(!attendanceMap[a.teacher_id]) attendanceMap[a.teacher_id] = {};
+      attendanceMap[a.teacher_id][a.week] = a.attended;
+    });
+
+    pairings = pairingsRes.data || [];
+
+    WEEKS.forEach(w=>{ resourcesByWeek[w.n] = []; });
+    (resourcesRes.data || []).forEach(r=>{ resourcesByWeek[r.week].push(r); });
+
+    WEEKS.forEach(w=>{ responsesByWeek[w.n] = []; });
+    (responsesRes.data || []).forEach(r=>{ if(responsesByWeek[r.week]) responsesByWeek[r.week].push(r); });
+
+    setSaveStatus('Synced');
   }
 
-  async function saveState(){
-    setSaveStatus('Saving…');
-    try{
-      await window.storage.set(STORAGE_KEY, JSON.stringify(state), false);
-      setSaveStatus('Saved');
-    }catch(e){
-      console.error('Storage error', e);
-      setSaveStatus('Save failed — changes kept in this tab only');
-    }
-  }
-
-  function persist(){
-    clearTimeout(saveTimer);
-    saveTimer = setTimeout(saveState, 250);
-  }
+  sb.channel('warmup_responses_changes')
+    .on('postgres_changes', { event:'INSERT', schema:'public', table:'warmup_responses' }, payload=>{
+      const r = payload.new;
+      if(!responsesByWeek[r.week]) responsesByWeek[r.week] = [];
+      responsesByWeek[r.week].unshift(r);
+      renderPulseTrend();
+      renderPulseEntries();
+      renderOverview();
+    })
+    .subscribe();
 
   function setSaveStatus(text){
     const el = document.getElementById('saveStatus');
@@ -645,21 +663,21 @@
 
   // ---------- Overview ----------
   function renderOverview(){
-    const totalTeachers = state.teachers.length;
+    const totalTeachers = teachers.length;
     const totalPossible = totalTeachers * WEEKS.length;
     let attended = 0;
-    state.teachers.forEach(t=>{
-      const rec = state.attendance[t.id] || {};
+    teachers.forEach(t=>{
+      const rec = attendanceMap[t.id] || {};
       WEEKS.forEach(w=>{ if(rec[w.n]) attended++; });
     });
     const attendanceRate = totalPossible ? Math.round((attended/totalPossible)*100) : 0;
-    const totalPulse = WEEKS.reduce((sum,w)=> sum + state.pulse[w.n].length, 0);
-    const totalPairings = state.pairings.length;
+    const totalResponses = WEEKS.reduce((sum,w)=> sum + responsesByWeek[w.n].length, 0);
+    const totalPairings = pairings.length;
 
     document.getElementById('overviewStats').innerHTML = `
       <div class="stat-card"><div class="num">${totalTeachers}</div><div class="lbl">New teachers tracked</div></div>
       <div class="stat-card"><div class="num">${attendanceRate}%</div><div class="lbl">Overall attendance</div></div>
-      <div class="stat-card"><div class="num">${totalPulse}</div><div class="lbl">Pulse checks logged</div></div>
+      <div class="stat-card"><div class="num">${totalResponses}</div><div class="lbl">Warm-up responses</div></div>
       <div class="stat-card"><div class="num">${totalPairings}</div><div class="lbl">Mentor pairings</div></div>
     `;
 
@@ -677,15 +695,15 @@
   // ---------- Roster ----------
   function renderRoster(){
     const wrap = document.getElementById('rosterTableWrap');
-    if(state.teachers.length === 0){
+    if(teachers.length === 0){
       wrap.innerHTML = '<div class="empty">No teachers yet. Add your first new teacher above to start tracking attendance.</div>';
       return;
     }
     let head = '<table><thead><tr><th>Teacher</th>' +
       WEEKS.map(w=>`<th class="center">W${w.n}</th>`).join('') +
       '<th class="center">Rate</th><th></th></tr></thead><tbody>';
-    let rows = state.teachers.map(t=>{
-      const rec = state.attendance[t.id] || {};
+    let rows = teachers.map(t=>{
+      const rec = attendanceMap[t.id] || {};
       let attended = 0;
       const cells = WEEKS.map(w=>{
         const checked = !!rec[w.n];
@@ -703,37 +721,47 @@
     wrap.innerHTML = head + rows + '</tbody></table>';
 
     wrap.querySelectorAll('input[type=checkbox]').forEach(cb=>{
-      cb.addEventListener('change', ()=>{
-        const tid = cb.dataset.teacher, wk = cb.dataset.week;
-        if(!state.attendance[tid]) state.attendance[tid] = {};
-        state.attendance[tid][wk] = cb.checked;
-        persist();
+      cb.addEventListener('change', async ()=>{
+        const tid = cb.dataset.teacher, wk = Number(cb.dataset.week);
+        if(!attendanceMap[tid]) attendanceMap[tid] = {};
+        attendanceMap[tid][wk] = cb.checked;
         renderRoster();
         renderOverview();
+        setSaveStatus('Saving…');
+        const { error } = await sb.from('attendance').upsert({ teacher_id: tid, week: wk, attended: cb.checked });
+        setSaveStatus(error ? 'Save failed' : 'Synced');
+        if(error) console.error(error);
       });
     });
     wrap.querySelectorAll('[data-remove-teacher]').forEach(b=>{
-      b.addEventListener('click', ()=>{
+      b.addEventListener('click', async ()=>{
         const id = b.dataset.removeTeacher;
         if(!confirm('Remove this teacher and their attendance record?')) return;
-        state.teachers = state.teachers.filter(t=>t.id!==id);
-        delete state.attendance[id];
-        persist();
+        const { error } = await sb.from('teachers').delete().eq('id', id);
+        if(error){ console.error(error); setSaveStatus('Save failed'); return; }
+        teachers = teachers.filter(t=>t.id!==id);
+        delete attendanceMap[id];
+        pairings = pairings.filter(p=>p.teacher_id!==id);
+        setSaveStatus('Synced');
         renderRoster();
         renderOverview();
         renderMentorTeacherOptions();
+        renderPairings();
       });
     });
   }
 
-  document.getElementById('addTeacherBtn').addEventListener('click', ()=>{
+  document.getElementById('addTeacherBtn').addEventListener('click', async ()=>{
     const nameEl = document.getElementById('teacherName');
     const roleEl = document.getElementById('teacherRole');
     const name = nameEl.value.trim();
     if(!name){ nameEl.focus(); return; }
-    state.teachers.push({ id: uid(), name, role: roleEl.value.trim() });
+    setSaveStatus('Saving…');
+    const { data, error } = await sb.from('teachers').insert({ name, role: roleEl.value.trim() || null }).select().single();
+    if(error){ console.error(error); setSaveStatus('Save failed'); return; }
+    teachers.push(data);
     nameEl.value=''; roleEl.value='';
-    persist();
+    setSaveStatus('Synced');
     renderRoster();
     renderOverview();
     renderMentorTeacherOptions();
@@ -749,73 +777,88 @@
         pulseSelectedWeek = Number(c.dataset.pweek);
         renderPulseChips();
         renderPulseEntries();
+        generateQR();
       });
     });
   }
 
+  function renderPulseStyleSelect(){
+    const sel = document.getElementById('pulseStyle');
+    sel.innerHTML = STYLES.map(s=>`<option value="${s.key}">${s.name}</option>`).join('');
+    sel.value = qrSelectedStyle;
+    sel.addEventListener('change', ()=>{
+      qrSelectedStyle = sel.value;
+      generateQR();
+    });
+  }
+
+  let qrInstance = null;
+  function generateQR(){
+    const url = TEACHER_PAGE_URL + '?week=' + pulseSelectedWeek + '&style=' + qrSelectedStyle;
+    document.getElementById('qrLink').textContent = url;
+    const holder = document.getElementById('qrCanvas');
+    if(window.QRCode){
+      holder.innerHTML = '';
+      qrInstance = new QRCode(holder, {
+        text: url, width:140, height:140,
+        colorDark:'#1C2B22', colorLight:'#F7F8F3',
+        correctLevel: QRCode.CorrectLevel.M
+      });
+    }
+  }
+
   function renderPulseTrend(){
+    const totalTeachers = teachers.length;
     const rows = WEEKS.map(w=>{
-      const entries = state.pulse[w.n];
-      const avg = entries.length ? (entries.reduce((s,e)=>s+e.rating,0)/entries.length) : 0;
-      const pct = (avg/5)*100;
+      const count = responsesByWeek[w.n].length;
+      const pct = totalTeachers ? Math.min(100, (count/totalTeachers)*100) : (count>0 ? 100 : 0);
       return `<div class="pulse-bar-row">
         <div class="w">Week ${w.n}</div>
         <div class="pulse-bar-track"><div class="pulse-bar-fill" style="width:${pct}%"></div></div>
-        <div class="v">${entries.length? avg.toFixed(1) : '—'}</div>
+        <div class="v">${count}</div>
       </div>`;
     }).join('');
     document.getElementById('pulseTrend').innerHTML = rows;
   }
 
   function renderPulseEntries(){
-    const entries = state.pulse[pulseSelectedWeek].slice().reverse();
+    const entries = responsesByWeek[pulseSelectedWeek];
     const list = document.getElementById('pulseEntries');
     if(entries.length===0){
-      list.innerHTML = '<div class="empty">No pulse checks logged for Week '+pulseSelectedWeek+' yet.</div>';
+      list.innerHTML = '<div class="empty">No responses submitted for Week '+pulseSelectedWeek+' yet.</div>';
       return;
     }
+    const styleName = key => (STYLES.find(s=>s.key===key) || {name:key}).name;
     list.innerHTML = entries.map(e=>`
       <div class="entry-item">
         <div>
-          ${e.note? `<div class="note">${escapeHtml(e.note)}</div>` : '<div class="note" style="color:var(--ink-soft);font-style:italic;">No note</div>'}
-          <div class="meta">${new Date(e.ts).toLocaleDateString()}</div>
+          <div class="note">${escapeHtml(e.response)}</div>
+          <div class="meta">${styleName(e.style)} · ${new Date(e.created_at).toLocaleString()}</div>
         </div>
-        <div class="rating">${e.rating}/5</div>
       </div>
     `).join('');
   }
 
-  document.getElementById('addPulseBtn').addEventListener('click', ()=>{
-    const rating = Number(document.getElementById('pulseRating').value);
-    const note = document.getElementById('pulseNote').value.trim();
-    state.pulse[pulseSelectedWeek].push({ id: uid(), rating, note, ts: Date.now() });
-    document.getElementById('pulseNote').value = '';
-    persist();
-    renderPulseTrend();
-    renderPulseEntries();
-    renderOverview();
-  });
-
   // ---------- Mentors ----------
   function renderMentorTeacherOptions(){
     const sel = document.getElementById('pairTeacher');
-    if(state.teachers.length===0){
+    if(teachers.length===0){
       sel.innerHTML = '<option value="">Add a teacher first</option>';
       return;
     }
-    sel.innerHTML = state.teachers.map(t=>`<option value="${t.id}">${escapeHtml(t.name)}</option>`).join('');
+    sel.innerHTML = teachers.map(t=>`<option value="${t.id}">${escapeHtml(t.name)}</option>`).join('');
   }
 
   function renderPairings(){
     const wrap = document.getElementById('pairingList');
-    if(state.pairings.length===0){
+    if(pairings.length===0){
       wrap.innerHTML = '<div class="empty">No mentor pairings yet.</div>';
       return;
     }
-    wrap.innerHTML = state.pairings.slice().reverse().map(p=>{
-      const teacher = state.teachers.find(t=>t.id===p.teacherId);
+    wrap.innerHTML = pairings.slice().reverse().map(p=>{
+      const teacher = teachers.find(t=>t.id===p.teacher_id);
       const teacherName = teacher ? teacher.name : '(removed teacher)';
-      const dateStr = p.date ? new Date(p.date+'T00:00:00').toLocaleDateString() : 'No date set';
+      const dateStr = p.lunch_date ? new Date(p.lunch_date+'T00:00:00').toLocaleDateString() : 'No date set';
       return `<div class="pairing-card">
         <div>
           <div class="names">${escapeHtml(teacherName)} &amp; ${escapeHtml(p.mentor)}</div>
@@ -825,26 +868,34 @@
       </div>`;
     }).join('');
     wrap.querySelectorAll('[data-remove-pair]').forEach(b=>{
-      b.addEventListener('click', ()=>{
-        state.pairings = state.pairings.filter(p=>p.id!==b.dataset.removePair);
-        persist();
+      b.addEventListener('click', async ()=>{
+        const id = b.dataset.removePair;
+        const { error } = await sb.from('mentor_pairings').delete().eq('id', id);
+        if(error){ console.error(error); setSaveStatus('Save failed'); return; }
+        pairings = pairings.filter(p=>p.id!==id);
+        setSaveStatus('Synced');
         renderPairings();
         renderOverview();
       });
     });
   }
 
-  document.getElementById('addPairBtn').addEventListener('click', ()=>{
+  document.getElementById('addPairBtn').addEventListener('click', async ()=>{
     const teacherId = document.getElementById('pairTeacher').value;
     const mentor = document.getElementById('pairMentor').value.trim();
     const date = document.getElementById('pairDate').value;
     const notes = document.getElementById('pairNotes').value.trim();
     if(!teacherId || !mentor) return;
-    state.pairings.push({ id: uid(), teacherId, mentor, date, notes });
+    setSaveStatus('Saving…');
+    const { data, error } = await sb.from('mentor_pairings').insert({
+      teacher_id: teacherId, mentor, lunch_date: date || null, notes: notes || null
+    }).select().single();
+    if(error){ console.error(error); setSaveStatus('Save failed'); return; }
+    pairings.push(data);
     document.getElementById('pairMentor').value='';
     document.getElementById('pairDate').value='';
     document.getElementById('pairNotes').value='';
-    persist();
+    setSaveStatus('Synced');
     renderPairings();
     renderOverview();
   });
@@ -866,7 +917,7 @@
   }
 
   function renderResourceList(){
-    const list = state.resources[resourceSelectedWeek].slice().reverse();
+    const list = resourcesByWeek[resourceSelectedWeek].slice().reverse();
     const wrap = document.getElementById('resourceList');
     if(list.length===0){
       wrap.innerHTML = '<div class="empty">No resources added for Week '+resourceSelectedWeek+' yet.</div>';
@@ -882,32 +933,44 @@
       </div>
     `).join('');
     wrap.querySelectorAll('[data-remove-res]').forEach(b=>{
-      b.addEventListener('click', ()=>{
-        state.resources[resourceSelectedWeek] = state.resources[resourceSelectedWeek].filter(r=>r.id!==b.dataset.removeRes);
-        persist();
+      b.addEventListener('click', async ()=>{
+        const id = b.dataset.removeRes;
+        const { error } = await sb.from('resources').delete().eq('id', id);
+        if(error){ console.error(error); setSaveStatus('Save failed'); return; }
+        resourcesByWeek[resourceSelectedWeek] = resourcesByWeek[resourceSelectedWeek].filter(r=>r.id!==id);
+        setSaveStatus('Synced');
         renderResourceList();
       });
     });
   }
 
-  document.getElementById('addResBtn').addEventListener('click', ()=>{
+  document.getElementById('addResBtn').addEventListener('click', async ()=>{
     const title = document.getElementById('resTitle').value.trim();
     const url = document.getElementById('resUrl').value.trim();
     const note = document.getElementById('resNote').value.trim();
     if(!title) return;
-    state.resources[resourceSelectedWeek].push({ id: uid(), title, url, note });
+    setSaveStatus('Saving…');
+    const { data, error } = await sb.from('resources').insert({
+      week: resourceSelectedWeek, title, url: url || null, note: note || null
+    }).select().single();
+    if(error){ console.error(error); setSaveStatus('Save failed'); return; }
+    resourcesByWeek[resourceSelectedWeek].push(data);
     document.getElementById('resTitle').value='';
     document.getElementById('resUrl').value='';
     document.getElementById('resNote').value='';
-    persist();
+    setSaveStatus('Synced');
     renderResourceList();
   });
 
   // ---------- Reset ----------
   document.getElementById('resetBtn').addEventListener('click', async ()=>{
-    if(!confirm('This clears all teachers, attendance, pulse checks, pairings, and resources. This cannot be undone. Continue?')) return;
-    state = defaultState();
-    persist();
+    if(!confirm('This clears all teachers, attendance, mentor pairings, and resources. Warm-up responses from teachers are not affected. This cannot be undone. Continue?')) return;
+    setSaveStatus('Resetting…');
+    await Promise.all([
+      sb.from('teachers').delete().not('id', 'is', null),
+      sb.from('resources').delete().not('id', 'is', null)
+    ]);
+    await loadAll();
     renderAll();
   });
 
@@ -923,8 +986,10 @@
     renderOverview();
     renderRoster();
     renderPulseChips();
+    renderPulseStyleSelect();
     renderPulseTrend();
     renderPulseEntries();
+    generateQR();
     renderMentorTeacherOptions();
     renderPairings();
     renderResourceChips();
@@ -932,8 +997,7 @@
   }
 
   (async function init(){
-    setSaveStatus('Loading…');
-    await loadState();
+    await loadAll();
     renderAll();
   })();
 })();
