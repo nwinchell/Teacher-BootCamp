@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ceiba New Teacher Boot Camp — Coordinator Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1C2B22;
+    --ink-soft:#3C4C42;
+    --paper:#EEF1E9;
+    --panel:#F7F8F3;
+    --panel-2:#E4E8DA;
+    --forest:#2F4F3A;
+    --forest-light:#4A7057;
+    --gold:#C99A3E;
+    --gold-light:#EAD3A0;
+    --slate:#3E5566;
+    --clay:#A85C3F;
+    --line:rgba(28,43,34,0.14);
+    --line-soft:rgba(28,43,34,0.08);
+    --shadow: 0 1px 2px rgba(28,43,34,0.06), 0 4px 16px rgba(28,43,34,0.06);
+    --radius: 10px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Inter',system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased;
+    min-height:100vh;
+  }
+  ::selection{ background:var(--gold-light); }
+  .app{
+    display:flex;
+    min-height:100vh;
+  }
+  /* ---------- Sidebar ---------- */
+  .sidebar{
+    width:252px;
+    flex-shrink:0;
+    background:var(--forest);
+    color:#EDEFE6;
+    display:flex;
+    flex-direction:column;
+    padding:28px 18px;
+    position:sticky;
+    top:0;
+    height:100vh;
+  }
+  .brand{
+    display:flex;
+    align-items:flex-start;
+    gap:10px;
+    padding:0 6px 22px 6px;
+    border-bottom:1px solid rgba(237,239,230,0.16);
+    margin-bottom:18px;
+  }
+  .brand svg{flex-shrink:0; margin-top:2px;}
+  .brand h1{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    font-size:19px;
+    line-height:1.22;
+    margin:0 0 4px 0;
+    letter-spacing:0.2px;
+  }
+  .brand p{
+    margin:0;
+    font-size:12px;
+    color:rgba(237,239,230,0.68);
+    line-height:1.4;
+  }
+  nav{display:flex; flex-direction:column; gap:2px;}
+  .nav-btn{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    background:none;
+    border:none;
+    color:rgba(237,239,230,0.82);
+    font-family:'Inter',sans-serif;
+    font-size:13.5px;
+    font-weight:500;
+    text-align:left;
+    padding:10px 12px;
+    border-radius:8px;
+    cursor:pointer;
+    transition:background 0.15s ease, color 0.15s ease;
+  }
+  .nav-btn svg{flex-shrink:0; opacity:0.85;}
+  .nav-btn:hover{ background:rgba(237,239,230,0.08); color:#fff; }
+  .nav-btn.active{ background:rgba(237,239,230,0.14); color:#fff; }
+  .nav-btn.active svg{opacity:1;}
+  .sidebar-foot{
+    margin-top:auto;
+    padding-top:16px;
+    border-top:1px solid rgba(237,239,230,0.16);
+  }
+  .save-status{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10.5px;
+    color:rgba(237,239,230,0.55);
+    display:flex;
+    align-items:center;
+    gap:6px;
+    padding:0 6px 10px 6px;
+    min-height:14px;
+  }
+  .save-dot{width:6px;height:6px;border-radius:50%;background:var(--gold);}
+  .reset-btn{
+    width:100%;
+    background:none;
+    border:1px solid rgba(237,239,230,0.22);
+    color:rgba(237,239,230,0.72);
+    font-family:'Inter',sans-serif;
+    font-size:12px;
+    padding:8px 10px;
+    border-radius:7px;
+    cursor:pointer;
+  }
+  .reset-btn:hover{ border-color:rgba(237,239,230,0.45); color:#fff; }
+
+  /* ---------- Main ---------- */
+  main{
+    flex:1;
+    min-width:0;
+    padding:36px 42px 60px 42px;
+    max-width:1080px;
+  }
+  .view{display:none;}
+  .view.active{display:block; animation:fade 0.25s ease;}
+  @keyframes fade{ from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:translateY(0);} }
+
+  .view-head{ margin-bottom:26px; }
+  .eyebrow{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    color:var(--forest-light);
+    margin:0 0 6px 0;
+  }
+  .view-head h2{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    font-size:28px;
+    margin:0 0 8px 0;
+    color:var(--ink);
+  }
+  .view-head p{
+    margin:0;
+    font-size:14px;
+    color:var(--ink-soft);
+    max-width:640px;
+    line-height:1.55;
+  }
+
+  /* stat row */
+  .stat-row{ display:flex; gap:14px; margin:22px 0 30px 0; flex-wrap:wrap; }
+  .stat-card{
+    background:var(--panel);
+    border:1px solid var(--line-soft);
+    border-radius:var(--radius);
+    padding:14px 18px;
+    min-width:140px;
+    box-shadow:var(--shadow);
+  }
+  .stat-card .num{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:22px;
+    font-weight:600;
+    color:var(--forest);
+  }
+  .stat-card .lbl{ font-size:11.5px; color:var(--ink-soft); margin-top:2px; }
+
+  /* ---------- Overview root-system timeline ---------- */
+  .timeline{ position:relative; padding-left:2px; margin-top:8px;}
+  .timeline::before{
+    content:"";
+    position:absolute;
+    left:19px;
+    top:8px;
+    bottom:8px;
+    width:2px;
+    background:linear-gradient(var(--forest-light), var(--gold));
+    opacity:0.35;
+  }
+  .week-node{
+    position:relative;
+    display:flex;
+    gap:18px;
+    padding:0 0 30px 0;
+  }
+  .week-ring{
+    flex-shrink:0;
+    width:40px;
+    height:40px;
+    border-radius:50%;
+    background:var(--panel);
+    border:2px solid var(--forest);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-family:'IBM Plex Mono',monospace;
+    font-weight:600;
+    font-size:14px;
+    color:var(--forest);
+    z-index:1;
+    box-shadow:0 0 0 4px var(--paper);
+  }
+  .week-card{
+    background:var(--panel);
+    border:1px solid var(--line-soft);
+    border-radius:var(--radius);
+    padding:14px 18px;
+    flex:1;
+    box-shadow:var(--shadow);
+  }
+  .week-card h3{
+    font-family:'Fraunces',serif;
+    font-size:16px;
+    font-weight:600;
+    margin:0 0 5px 0;
+    color:var(--ink);
+  }
+  .week-card p{ margin:0; font-size:13px; color:var(--ink-soft); line-height:1.5; }
+
+  /* ---------- shared components ---------- */
+  .panel{
+    background:var(--panel);
+    border:1px solid var(--line-soft);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    padding:20px;
+    margin-bottom:20px;
+  }
+  .panel h3{
+    font-family:'Fraunces',serif;
+    font-size:16px;
+    font-weight:600;
+    margin:0 0 14px 0;
+  }
+  .form-row{ display:flex; gap:10px; flex-wrap:wrap; align-items:flex-end; }
+  .field{ display:flex; flex-direction:column; gap:5px; }
+  .field label{ font-size:11.5px; font-weight:600; color:var(--ink-soft); }
+  input[type=text], input[type=date], input[type=url], select, textarea{
+    font-family:'Inter',sans-serif;
+    font-size:13.5px;
+    padding:8px 10px;
+    border-radius:7px;
+    border:1px solid var(--line);
+    background:#fff;
+    color:var(--ink);
+    min-width:160px;
+  }
+  textarea{ min-width:260px; min-height:56px; resize:vertical; }
+  input:focus, select:focus, textarea:focus{
+    outline:2px solid var(--gold);
+    outline-offset:1px;
+    border-color:var(--gold);
+  }
+  .btn{
+    font-family:'Inter',sans-serif;
+    font-size:13px;
+    font-weight:600;
+    padding:9px 16px;
+    border-radius:7px;
+    border:none;
+    cursor:pointer;
+    background:var(--forest);
+    color:#fff;
+    transition:background 0.15s ease;
+  }
+  .btn:hover{ background:var(--forest-light); }
+  .btn.ghost{
+    background:none;
+    color:var(--clay);
+    border:1px solid var(--line);
+    font-weight:500;
+    padding:6px 10px;
+    font-size:12px;
+  }
+  .btn.ghost:hover{ background:rgba(168,92,63,0.08); }
+
+  table{ width:100%; border-collapse:collapse; font-size:13px; }
+  thead th{
+    text-align:left;
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:0.04em;
+    color:var(--ink-soft);
+    font-weight:600;
+    padding:6px 8px;
+    border-bottom:1px solid var(--line);
+  }
+  thead th.center, td.center{ text-align:center; }
+  tbody td{ padding:8px; border-bottom:1px solid var(--line-soft); vertical-align:middle; }
+  tbody tr:last-child td{ border-bottom:none; }
+  .teacher-name{ font-weight:600; }
+  .teacher-role{ font-size:11.5px; color:var(--ink-soft); }
+  input[type=checkbox]{
+    width:17px; height:17px;
+    accent-color:var(--forest);
+    cursor:pointer;
+  }
+  .pct-pill{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;
+    font-weight:600;
+    padding:3px 8px;
+    border-radius:20px;
+    background:var(--gold-light);
+    color:#5a4419;
+  }
+  .empty{
+    text-align:center;
+    padding:26px 16px;
+    color:var(--ink-soft);
+    font-size:13px;
+    border:1px dashed var(--line);
+    border-radius:var(--radius);
+    background:rgba(255,255,255,0.4);
+  }
+
+  /* pulse bars */
+  .pulse-bars{ display:flex; flex-direction:column; gap:8px; margin-top:6px;}
+  .pulse-bar-row{ display:flex; align-items:center; gap:10px; }
+  .pulse-bar-row .w{ width:56px; font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:var(--ink-soft); flex-shrink:0;}
+  .pulse-bar-track{ flex:1; height:9px; background:var(--panel-2); border-radius:6px; overflow:hidden;}
+  .pulse-bar-fill{ height:100%; background:linear-gradient(90deg, var(--forest-light), var(--gold)); border-radius:6px;}
+  .pulse-bar-row .v{ width:34px; text-align:right; font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:var(--ink-soft);}
+
+  .entry-list{ display:flex; flex-direction:column; gap:8px; margin-top:14px; }
+  .entry-item{
+    display:flex; justify-content:space-between; align-items:flex-start; gap:12px;
+    padding:10px 12px; background:#fff; border:1px solid var(--line-soft); border-radius:8px;
+  }
+  .entry-item .rating{
+    font-family:'IBM Plex Mono',monospace; font-weight:600; font-size:12.5px;
+    color:var(--forest); flex-shrink:0;
+  }
+  .entry-item .note{ font-size:13px; color:var(--ink); flex:1; }
+  .entry-item .meta{ font-size:11px; color:var(--ink-soft); margin-top:2px; }
+
+  .pairing-card{
+    display:flex; justify-content:space-between; align-items:flex-start;
+    padding:12px 14px; background:#fff; border:1px solid var(--line-soft); border-radius:8px; margin-bottom:8px;
+  }
+  .pairing-card .names{ font-weight:600; font-size:13.5px; }
+  .pairing-card .sub{ font-size:12px; color:var(--ink-soft); margin-top:3px; }
+
+  .resource-item{
+    display:flex; justify-content:space-between; align-items:flex-start; gap:10px;
+    padding:10px 12px; background:#fff; border:1px solid var(--line-soft); border-radius:8px; margin-bottom:8px;
+  }
+  .resource-item a{ color:var(--slate); font-weight:600; font-size:13.5px; text-decoration:none; }
+  .resource-item a:hover{ text-decoration:underline; }
+  .resource-item .note{ font-size:12.5px; color:var(--ink-soft); margin-top:3px; }
+
+  .week-select-row{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px; }
+  .week-chip{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;
+    padding:6px 12px;
+    border-radius:20px;
+    border:1px solid var(--line);
+    background:#fff;
+    cursor:pointer;
+    color:var(--ink-soft);
+  }
+  .week-chip.active{ background:var(--forest); border-color:var(--forest); color:#fff; }
+
+  @media (max-width: 760px){
+    .app{ flex-direction:column; }
+    .sidebar{ width:100%; height:auto; position:relative; flex-direction:row; overflow-x:auto; padding:16px; }
+    .brand{ display:none; }
+    nav{ flex-direction:row; }
+    .sidebar-foot{ display:none; }
+    main{ padding:22px 18px 50px 18px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand">
+      <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
+        <path d="M13 3 L13 23 M13 8 Q7 10 5 15 M13 8 Q19 10 21 15 M13 13 Q8 15 6 20 M13 13 Q18 15 20 20" stroke="#EAD3A0" stroke-width="1.6" stroke-linecap="round"/>
+        <circle cx="13" cy="4.5" r="2.4" fill="#C99A3E"/>
+      </svg>
+      <div>
+        <h1>New Teacher Boot Camp</h1>
+        <p>Ceiba · Coordinator Dashboard</p>
+      </div>
+    </div>
+    <nav>
+      <button class="nav-btn active" data-view="overview">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 1v14M8 5 3 8m5-3 5 3M8 9l-4 3m4-3 4 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        Overview
+      </button>
+      <button class="nav-btn" data-view="roster">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="6" cy="5" r="2.4" stroke="currentColor" stroke-width="1.4"/><circle cx="12" cy="6.5" r="1.8" stroke="currentColor" stroke-width="1.4"/><path d="M1.5 14c0-2.8 2-4.4 4.5-4.4s4.5 1.6 4.5 4.4M10.5 9.8c2 0 3.5 1.3 3.5 3.6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        Roster &amp; Attendance
+      </button>
+      <button class="nav-btn" data-view="pulse">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M1 8h3l1.5-4L8 13l1.7-7L11 8h4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Pulse Checks
+      </button>
+      <button class="nav-btn" data-view="mentors">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="5" cy="5.5" r="2.3" stroke="currentColor" stroke-width="1.4"/><circle cx="11" cy="5.5" r="2.3" stroke="currentColor" stroke-width="1.4"/><path d="M1.5 13.5c0-2.5 1.6-4 3.5-4s3.5 1.5 3.5 4M7.5 13.5c0-2.5 1.6-4 3.5-4s3.5 1.5 3.5 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        Mentor Pairings
+      </button>
+      <button class="nav-btn" data-view="resources">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 2.5h7.5L13 5v8.5H3z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M5.5 6h5M5.5 8.5h5M5.5 11h3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+        Resources
+      </button>
+    </nav>
+    <div class="sidebar-foot">
+      <div class="save-status" id="saveStatus"><span class="save-dot"></span>Loading…</div>
+      <button class="reset-btn" id="resetBtn">Reset all data</button>
+    </div>
+  </aside>
+
+  <main>
+    <!-- OVERVIEW -->
+    <section class="view active" id="view-overview">
+      <div class="view-head">
+        <p class="eyebrow">First eight weeks · Wednesdays · 60 minutes</p>
+        <h2>Program overview</h2>
+        <p>Establish site-specific routines and practices, build community, and make sure every teacher new to the classroom — or new to Ceiba — feels supported from day one.</p>
+      </div>
+      <div class="stat-row" id="overviewStats"></div>
+      <div class="timeline" id="timeline"></div>
+    </section>
+
+    <!-- ROSTER -->
+    <section class="view" id="view-roster">
+      <div class="view-head">
+        <p class="eyebrow">Roster</p>
+        <h2>Attendance &amp; roster</h2>
+        <p>Add every new teacher once, then check them off week by week. Attendance percentage updates as you go.</p>
+      </div>
+      <div class="panel">
+        <h3>Add a teacher</h3>
+        <div class="form-row">
+          <div class="field">
+            <label for="teacherName">Name</label>
+            <input type="text" id="teacherName" placeholder="e.g. Priya Anand">
+          </div>
+          <div class="field">
+            <label for="teacherRole">Grade / subject (optional)</label>
+            <input type="text" id="teacherRole" placeholder="e.g. 7th Grade Science">
+          </div>
+          <button class="btn" id="addTeacherBtn">Add teacher</button>
+        </div>
+      </div>
+      <div class="panel" style="overflow-x:auto;">
+        <h3>Attendance grid</h3>
+        <div id="rosterTableWrap"></div>
+      </div>
+    </section>
+
+    <!-- PULSE -->
+    <section class="view" id="view-pulse">
+      <div class="view-head">
+        <p class="eyebrow">After every session</p>
+        <h2>Pulse checks</h2>
+        <p>A quick, low-friction way to see how confident new teachers feel each week — feed the trend straight into the Week Eight reflection.</p>
+      </div>
+      <div class="panel">
+        <h3>Confidence trend, all weeks</h3>
+        <div class="pulse-bars" id="pulseTrend"></div>
+      </div>
+      <div class="panel">
+        <h3>Log a pulse check</h3>
+        <div class="week-select-row" id="pulseWeekChips"></div>
+        <div class="form-row">
+          <div class="field">
+            <label for="pulseRating">Confidence (1–5)</label>
+            <select id="pulseRating">
+              <option value="1">1 — Still lost</option>
+              <option value="2">2 — Shaky</option>
+              <option value="3" selected>3 — Getting there</option>
+              <option value="4">4 — Solid</option>
+              <option value="5">5 — Confident</option>
+            </select>
+          </div>
+          <div class="field" style="flex:1;">
+            <label for="pulseNote">Note (optional)</label>
+            <textarea id="pulseNote" placeholder="What's still unclear? What clicked?"></textarea>
+          </div>
+          <button class="btn" id="addPulseBtn">Add entry</button>
+        </div>
+        <div class="entry-list" id="pulseEntries"></div>
+      </div>
+    </section>
+
+    <!-- MENTORS -->
+    <section class="view" id="view-mentors">
+      <div class="view-head">
+        <p class="eyebrow">Week five and beyond</p>
+        <h2>Mentor pairings</h2>
+        <p>Match each new teacher with a veteran mentor and track the community lunch that kicks things off.</p>
+      </div>
+      <div class="panel">
+        <h3>Add a pairing</h3>
+        <div class="form-row">
+          <div class="field">
+            <label for="pairTeacher">New teacher</label>
+            <select id="pairTeacher"></select>
+          </div>
+          <div class="field">
+            <label for="pairMentor">Veteran mentor</label>
+            <input type="text" id="pairMentor" placeholder="e.g. James Okafor">
+          </div>
+          <div class="field">
+            <label for="pairDate">Lunch date</label>
+            <input type="date" id="pairDate">
+          </div>
+          <div class="field" style="flex:1;">
+            <label for="pairNotes">Notes (optional)</label>
+            <input type="text" id="pairNotes" placeholder="e.g. Meeting in the staff lounge">
+          </div>
+          <button class="btn" id="addPairBtn">Add pairing</button>
+        </div>
+      </div>
+      <div class="panel">
+        <h3>Current pairings</h3>
+        <div id="pairingList"></div>
+      </div>
+    </section>
+
+    <!-- RESOURCES -->
+    <section class="view" id="view-resources">
+      <div class="view-head">
+        <p class="eyebrow">Per-week materials</p>
+        <h2>Resources</h2>
+        <p>Keep each week's slides, links, and handouts in one place instead of scattered across email threads.</p>
+      </div>
+      <div class="panel">
+        <div class="week-select-row" id="resourceWeekChips"></div>
+        <p id="resourceWeekDesc" style="font-size:13px; color:var(--ink-soft); margin:-6px 0 16px 0;"></p>
+        <div class="form-row">
+          <div class="field">
+            <label for="resTitle">Title</label>
+            <input type="text" id="resTitle" placeholder="e.g. Gradebook walkthrough slides">
+          </div>
+          <div class="field">
+            <label for="resUrl">Link (optional)</label>
+            <input type="url" id="resUrl" placeholder="https://…">
+          </div>
+          <div class="field" style="flex:1;">
+            <label for="resNote">Note (optional)</label>
+            <input type="text" id="resNote" placeholder="e.g. Bring a laptop">
+          </div>
+          <button class="btn" id="addResBtn">Add resource</button>
+        </div>
+        <div id="resourceList" style="margin-top:16px;"></div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script>
+(function(){
+  const STORAGE_KEY = 'ceiba-bootcamp-v1';
+
+  const WEEKS = [
+    { n:1, title:"Welcome and Orientation", desc:"Campus tour, introductions to key staff, logistics like schedules, copiers, and technology access." },
+    { n:2, title:"Classroom Routines and Procedures", desc:"Site-specific expectations for daily flow, attendance, and transitions." },
+    { n:3, title:"Grading and Gradebook Workflows", desc:"Grading norms, gradebook software walkthrough, and communicating grades to students." },
+    { n:4, title:"Parent and Guardian Communication", desc:"Norms for outreach, tools used, and handling difficult conversations." },
+    { n:5, title:"School Culture and Community Building", desc:"Values, traditions, and a social element — lunch with veteran teacher mentors." },
+    { n:6, title:"Curriculum and Instructional Resources", desc:"Overview of curriculum maps, shared resources, and instructional expectations." },
+    { n:7, title:"Classroom Management for Middle and High School", desc:"Practical strategies and troubleshooting common challenges." },
+    { n:8, title:"Reflection and Peer Share", desc:"New teachers share wins and struggles, feedback on the boot camp itself, and planning next steps." }
+  ];
+
+  function defaultState(){
+    const pulse = {}, resources = {};
+    WEEKS.forEach(w => { pulse[w.n] = []; resources[w.n] = []; });
+    return { teachers: [], attendance: {}, pulse, resources, pairings: [] };
+  }
+
+  let state = defaultState();
+  let pulseSelectedWeek = 1;
+  let resourceSelectedWeek = 1;
+  let saveTimer = null;
+
+  function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+
+  async function loadState(){
+    try{
+      const res = await window.storage.get(STORAGE_KEY, false);
+      if(res && res.value){
+        const parsed = JSON.parse(res.value);
+        state = Object.assign(defaultState(), parsed);
+        WEEKS.forEach(w=>{
+          if(!state.pulse[w.n]) state.pulse[w.n] = [];
+          if(!state.resources[w.n]) state.resources[w.n] = [];
+        });
+      }
+    }catch(e){
+      // no saved data yet — start fresh
+    }
+    setSaveStatus('Loaded');
+  }
+
+  async function saveState(){
+    setSaveStatus('Saving…');
+    try{
+      await window.storage.set(STORAGE_KEY, JSON.stringify(state), false);
+      setSaveStatus('Saved');
+    }catch(e){
+      console.error('Storage error', e);
+      setSaveStatus('Save failed — changes kept in this tab only');
+    }
+  }
+
+  function persist(){
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(saveState, 250);
+  }
+
+  function setSaveStatus(text){
+    const el = document.getElementById('saveStatus');
+    if(el) el.innerHTML = '<span class="save-dot"></span>' + text;
+  }
+
+  // ---------- Navigation ----------
+  document.querySelectorAll('.nav-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+      document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('view-'+btn.dataset.view).classList.add('active');
+    });
+  });
+
+  // ---------- Overview ----------
+  function renderOverview(){
+    const totalTeachers = state.teachers.length;
+    const totalPossible = totalTeachers * WEEKS.length;
+    let attended = 0;
+    state.teachers.forEach(t=>{
+      const rec = state.attendance[t.id] || {};
+      WEEKS.forEach(w=>{ if(rec[w.n]) attended++; });
+    });
+    const attendanceRate = totalPossible ? Math.round((attended/totalPossible)*100) : 0;
+    const totalPulse = WEEKS.reduce((sum,w)=> sum + state.pulse[w.n].length, 0);
+    const totalPairings = state.pairings.length;
+
+    document.getElementById('overviewStats').innerHTML = `
+      <div class="stat-card"><div class="num">${totalTeachers}</div><div class="lbl">New teachers tracked</div></div>
+      <div class="stat-card"><div class="num">${attendanceRate}%</div><div class="lbl">Overall attendance</div></div>
+      <div class="stat-card"><div class="num">${totalPulse}</div><div class="lbl">Pulse checks logged</div></div>
+      <div class="stat-card"><div class="num">${totalPairings}</div><div class="lbl">Mentor pairings</div></div>
+    `;
+
+    document.getElementById('timeline').innerHTML = WEEKS.map(w=>`
+      <div class="week-node">
+        <div class="week-ring">${w.n}</div>
+        <div class="week-card">
+          <h3>${w.title}</h3>
+          <p>${w.desc}</p>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  // ---------- Roster ----------
+  function renderRoster(){
+    const wrap = document.getElementById('rosterTableWrap');
+    if(state.teachers.length === 0){
+      wrap.innerHTML = '<div class="empty">No teachers yet. Add your first new teacher above to start tracking attendance.</div>';
+      return;
+    }
+    let head = '<table><thead><tr><th>Teacher</th>' +
+      WEEKS.map(w=>`<th class="center">W${w.n}</th>`).join('') +
+      '<th class="center">Rate</th><th></th></tr></thead><tbody>';
+    let rows = state.teachers.map(t=>{
+      const rec = state.attendance[t.id] || {};
+      let attended = 0;
+      const cells = WEEKS.map(w=>{
+        const checked = !!rec[w.n];
+        if(checked) attended++;
+        return `<td class="center"><input type="checkbox" data-teacher="${t.id}" data-week="${w.n}" ${checked?'checked':''}></td>`;
+      }).join('');
+      const pct = Math.round((attended/WEEKS.length)*100);
+      return `<tr>
+        <td><div class="teacher-name">${escapeHtml(t.name)}</div>${t.role?`<div class="teacher-role">${escapeHtml(t.role)}</div>`:''}</td>
+        ${cells}
+        <td class="center"><span class="pct-pill">${pct}%</span></td>
+        <td class="center"><button class="btn ghost" data-remove-teacher="${t.id}">Remove</button></td>
+      </tr>`;
+    }).join('');
+    wrap.innerHTML = head + rows + '</tbody></table>';
+
+    wrap.querySelectorAll('input[type=checkbox]').forEach(cb=>{
+      cb.addEventListener('change', ()=>{
+        const tid = cb.dataset.teacher, wk = cb.dataset.week;
+        if(!state.attendance[tid]) state.attendance[tid] = {};
+        state.attendance[tid][wk] = cb.checked;
+        persist();
+        renderRoster();
+        renderOverview();
+      });
+    });
+    wrap.querySelectorAll('[data-remove-teacher]').forEach(b=>{
+      b.addEventListener('click', ()=>{
+        const id = b.dataset.removeTeacher;
+        if(!confirm('Remove this teacher and their attendance record?')) return;
+        state.teachers = state.teachers.filter(t=>t.id!==id);
+        delete state.attendance[id];
+        persist();
+        renderRoster();
+        renderOverview();
+        renderMentorTeacherOptions();
+      });
+    });
+  }
+
+  document.getElementById('addTeacherBtn').addEventListener('click', ()=>{
+    const nameEl = document.getElementById('teacherName');
+    const roleEl = document.getElementById('teacherRole');
+    const name = nameEl.value.trim();
+    if(!name){ nameEl.focus(); return; }
+    state.teachers.push({ id: uid(), name, role: roleEl.value.trim() });
+    nameEl.value=''; roleEl.value='';
+    persist();
+    renderRoster();
+    renderOverview();
+    renderMentorTeacherOptions();
+  });
+
+  // ---------- Pulse ----------
+  function renderPulseChips(){
+    document.getElementById('pulseWeekChips').innerHTML = WEEKS.map(w=>
+      `<button class="week-chip ${w.n===pulseSelectedWeek?'active':''}" data-pweek="${w.n}">Week ${w.n}</button>`
+    ).join('');
+    document.querySelectorAll('#pulseWeekChips [data-pweek]').forEach(c=>{
+      c.addEventListener('click', ()=>{
+        pulseSelectedWeek = Number(c.dataset.pweek);
+        renderPulseChips();
+        renderPulseEntries();
+      });
+    });
+  }
+
+  function renderPulseTrend(){
+    const rows = WEEKS.map(w=>{
+      const entries = state.pulse[w.n];
+      const avg = entries.length ? (entries.reduce((s,e)=>s+e.rating,0)/entries.length) : 0;
+      const pct = (avg/5)*100;
+      return `<div class="pulse-bar-row">
+        <div class="w">Week ${w.n}</div>
+        <div class="pulse-bar-track"><div class="pulse-bar-fill" style="width:${pct}%"></div></div>
+        <div class="v">${entries.length? avg.toFixed(1) : '—'}</div>
+      </div>`;
+    }).join('');
+    document.getElementById('pulseTrend').innerHTML = rows;
+  }
+
+  function renderPulseEntries(){
+    const entries = state.pulse[pulseSelectedWeek].slice().reverse();
+    const list = document.getElementById('pulseEntries');
+    if(entries.length===0){
+      list.innerHTML = '<div class="empty">No pulse checks logged for Week '+pulseSelectedWeek+' yet.</div>';
+      return;
+    }
+    list.innerHTML = entries.map(e=>`
+      <div class="entry-item">
+        <div>
+          ${e.note? `<div class="note">${escapeHtml(e.note)}</div>` : '<div class="note" style="color:var(--ink-soft);font-style:italic;">No note</div>'}
+          <div class="meta">${new Date(e.ts).toLocaleDateString()}</div>
+        </div>
+        <div class="rating">${e.rating}/5</div>
+      </div>
+    `).join('');
+  }
+
+  document.getElementById('addPulseBtn').addEventListener('click', ()=>{
+    const rating = Number(document.getElementById('pulseRating').value);
+    const note = document.getElementById('pulseNote').value.trim();
+    state.pulse[pulseSelectedWeek].push({ id: uid(), rating, note, ts: Date.now() });
+    document.getElementById('pulseNote').value = '';
+    persist();
+    renderPulseTrend();
+    renderPulseEntries();
+    renderOverview();
+  });
+
+  // ---------- Mentors ----------
+  function renderMentorTeacherOptions(){
+    const sel = document.getElementById('pairTeacher');
+    if(state.teachers.length===0){
+      sel.innerHTML = '<option value="">Add a teacher first</option>';
+      return;
+    }
+    sel.innerHTML = state.teachers.map(t=>`<option value="${t.id}">${escapeHtml(t.name)}</option>`).join('');
+  }
+
+  function renderPairings(){
+    const wrap = document.getElementById('pairingList');
+    if(state.pairings.length===0){
+      wrap.innerHTML = '<div class="empty">No mentor pairings yet.</div>';
+      return;
+    }
+    wrap.innerHTML = state.pairings.slice().reverse().map(p=>{
+      const teacher = state.teachers.find(t=>t.id===p.teacherId);
+      const teacherName = teacher ? teacher.name : '(removed teacher)';
+      const dateStr = p.date ? new Date(p.date+'T00:00:00').toLocaleDateString() : 'No date set';
+      return `<div class="pairing-card">
+        <div>
+          <div class="names">${escapeHtml(teacherName)} &amp; ${escapeHtml(p.mentor)}</div>
+          <div class="sub">${dateStr}${p.notes? ' · '+escapeHtml(p.notes) : ''}</div>
+        </div>
+        <button class="btn ghost" data-remove-pair="${p.id}">Remove</button>
+      </div>`;
+    }).join('');
+    wrap.querySelectorAll('[data-remove-pair]').forEach(b=>{
+      b.addEventListener('click', ()=>{
+        state.pairings = state.pairings.filter(p=>p.id!==b.dataset.removePair);
+        persist();
+        renderPairings();
+        renderOverview();
+      });
+    });
+  }
+
+  document.getElementById('addPairBtn').addEventListener('click', ()=>{
+    const teacherId = document.getElementById('pairTeacher').value;
+    const mentor = document.getElementById('pairMentor').value.trim();
+    const date = document.getElementById('pairDate').value;
+    const notes = document.getElementById('pairNotes').value.trim();
+    if(!teacherId || !mentor) return;
+    state.pairings.push({ id: uid(), teacherId, mentor, date, notes });
+    document.getElementById('pairMentor').value='';
+    document.getElementById('pairDate').value='';
+    document.getElementById('pairNotes').value='';
+    persist();
+    renderPairings();
+    renderOverview();
+  });
+
+  // ---------- Resources ----------
+  function renderResourceChips(){
+    document.getElementById('resourceWeekChips').innerHTML = WEEKS.map(w=>
+      `<button class="week-chip ${w.n===resourceSelectedWeek?'active':''}" data-rweek="${w.n}">Week ${w.n}</button>`
+    ).join('');
+    document.querySelectorAll('#resourceWeekChips [data-rweek]').forEach(c=>{
+      c.addEventListener('click', ()=>{
+        resourceSelectedWeek = Number(c.dataset.rweek);
+        renderResourceChips();
+        renderResourceList();
+      });
+    });
+    const w = WEEKS.find(w=>w.n===resourceSelectedWeek);
+    document.getElementById('resourceWeekDesc').textContent = w ? (w.title + ' — ' + w.desc) : '';
+  }
+
+  function renderResourceList(){
+    const list = state.resources[resourceSelectedWeek].slice().reverse();
+    const wrap = document.getElementById('resourceList');
+    if(list.length===0){
+      wrap.innerHTML = '<div class="empty">No resources added for Week '+resourceSelectedWeek+' yet.</div>';
+      return;
+    }
+    wrap.innerHTML = list.map(r=>`
+      <div class="resource-item">
+        <div>
+          ${r.url ? `<a href="${escapeAttr(r.url)}" target="_blank" rel="noopener">${escapeHtml(r.title)}</a>` : `<div style="font-weight:600;font-size:13.5px;">${escapeHtml(r.title)}</div>`}
+          ${r.note ? `<div class="note">${escapeHtml(r.note)}</div>` : ''}
+        </div>
+        <button class="btn ghost" data-remove-res="${r.id}">Remove</button>
+      </div>
+    `).join('');
+    wrap.querySelectorAll('[data-remove-res]').forEach(b=>{
+      b.addEventListener('click', ()=>{
+        state.resources[resourceSelectedWeek] = state.resources[resourceSelectedWeek].filter(r=>r.id!==b.dataset.removeRes);
+        persist();
+        renderResourceList();
+      });
+    });
+  }
+
+  document.getElementById('addResBtn').addEventListener('click', ()=>{
+    const title = document.getElementById('resTitle').value.trim();
+    const url = document.getElementById('resUrl').value.trim();
+    const note = document.getElementById('resNote').value.trim();
+    if(!title) return;
+    state.resources[resourceSelectedWeek].push({ id: uid(), title, url, note });
+    document.getElementById('resTitle').value='';
+    document.getElementById('resUrl').value='';
+    document.getElementById('resNote').value='';
+    persist();
+    renderResourceList();
+  });
+
+  // ---------- Reset ----------
+  document.getElementById('resetBtn').addEventListener('click', async ()=>{
+    if(!confirm('This clears all teachers, attendance, pulse checks, pairings, and resources. This cannot be undone. Continue?')) return;
+    state = defaultState();
+    persist();
+    renderAll();
+  });
+
+  // ---------- Utils ----------
+  function escapeHtml(str){
+    return String(str).replace(/[&<>"']/g, s=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[s]));
+  }
+  function escapeAttr(str){
+    return escapeHtml(str);
+  }
+
+  function renderAll(){
+    renderOverview();
+    renderRoster();
+    renderPulseChips();
+    renderPulseTrend();
+    renderPulseEntries();
+    renderMentorTeacherOptions();
+    renderPairings();
+    renderResourceChips();
+    renderResourceList();
+  }
+
+  (async function init(){
+    setSaveStatus('Loading…');
+    await loadState();
+    renderAll();
+  })();
+})();
+</script>
+</body>
+</html>
