@@ -389,9 +389,13 @@
   .slides-deck-head{ display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:10px; }
   .slides-deck-head h4{ font-family:'Fraunces',serif; font-size:15px; font-weight:600; margin:0; }
   .slides-deck-actions{ display:flex; gap:8px; flex-shrink:0; }
-  .slides-deck iframe{ width:100%; aspect-ratio:16/9; border:1px solid var(--line); border-radius:8px; display:block; }
-  .slides-deck iframe.generic-embed{ width:320px; max-width:100%; aspect-ratio:4/3; }
-  .slides-deck iframe:fullscreen{ aspect-ratio:auto; }
+  .slides-deck iframe, .slides-deck img.generic-embed{
+    width:100%; aspect-ratio:16/9; border:1px solid var(--line); border-radius:8px; display:block;
+  }
+  .slides-deck img.generic-embed{ object-fit:cover; object-position:top; background:var(--panel-2); }
+  .slides-deck iframe:fullscreen, .slides-deck img.generic-embed:fullscreen{ aspect-ratio:auto; }
+  .slides-deck img.generic-embed:fullscreen{ object-fit:contain; }
+  .slides-deck .preview-note{ font-size:11.5px; color:var(--ink-soft); margin:8px 0 0 0; }
   .slides-order-actions{ margin-bottom:14px; }
   .reorder-controls{ display:flex; flex-direction:column; gap:4px; flex-shrink:0; }
   .reorder-controls button{
@@ -810,6 +814,17 @@
     return m ? 'https://docs.google.com/presentation/d/' + m[1] + '/embed?start=false&loop=false&delayms=3000' : null;
   }
 
+  function screenshotUrl(url){
+    return 'https://api.microlink.io/?url=' + encodeURIComponent(url) + '&screenshot=true&meta=false&embed=screenshot.url';
+  }
+
+  window.handlePreviewImgError = function(el){
+    const note = document.createElement('div');
+    note.className = 'empty';
+    note.textContent = 'Preview unavailable — use "Open" instead.';
+    el.replaceWith(note);
+  };
+
   function renderWeekSlidesList(){
     const wrap = document.getElementById('weekSlidesList');
     const decks = weekSlides[weekDetailSelected] || [];
@@ -819,13 +834,16 @@
     }
     wrap.innerHTML = decks.map((d,idx)=>{
       const knownEmbed = slidesEmbedUrl(d.url);
-      const embed = knownEmbed || d.url;
       const reorder = slidesReorderMode
         ? `<div class="reorder-controls">
              <button data-move-up="${d.id}" ${idx===0 ? 'disabled' : ''}>▲</button>
              <button data-move-down="${d.id}" ${idx===decks.length-1 ? 'disabled' : ''}>▼</button>
            </div>`
         : '';
+      const preview = knownEmbed
+        ? `<iframe id="deck-preview-${d.id}" src="${escapeAttr(knownEmbed)}" allow="fullscreen" allowfullscreen></iframe>`
+        : `<img id="deck-preview-${d.id}" class="generic-embed" src="${escapeAttr(screenshotUrl(d.url))}" alt="${escapeAttr(d.title)} preview" onerror="handlePreviewImgError(this)">
+           <p class="preview-note">Snapshot of the page — live embedding isn't available for this site. Use "Open" to view it live.</p>`;
       return `<div class="slides-deck">
         ${reorder}
         <div class="slides-deck-body">
@@ -837,8 +855,7 @@
               <button class="btn ghost" data-remove-deck="${d.id}">Remove</button>
             </div>
           </div>
-          <iframe id="deck-iframe-${d.id}" class="${knownEmbed ? '' : 'generic-embed'}" src="${escapeAttr(embed)}" allow="fullscreen" allowfullscreen></iframe>
-          <p style="font-size:11.5px; color:var(--ink-soft); margin:8px 0 0 0;">If the preview above is blank, that site doesn't allow embedding — use "Open" instead.</p>
+          ${preview}
         </div>
       </div>`;
     }).join('');
@@ -851,8 +868,8 @@
     });
     wrap.querySelectorAll('[data-expand-deck]').forEach(b=>{
       b.addEventListener('click', ()=>{
-        const iframe = document.getElementById('deck-iframe-'+b.dataset.expandDeck);
-        if(iframe && iframe.requestFullscreen) iframe.requestFullscreen().catch(err=>console.error('Fullscreen request failed', err));
+        const el = document.getElementById('deck-preview-'+b.dataset.expandDeck);
+        if(el && el.requestFullscreen) el.requestFullscreen().catch(err=>console.error('Fullscreen request failed', err));
       });
     });
     wrap.querySelectorAll('[data-remove-deck]').forEach(b=>{
