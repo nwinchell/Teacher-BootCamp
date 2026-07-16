@@ -139,6 +139,10 @@
   @keyframes fade{ from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:translateY(0);} }
 
   .view-head{ margin-bottom:26px; }
+  .week-detail-head{ display:flex; justify-content:space-between; align-items:flex-start; gap:16px; flex-wrap:wrap; }
+  .week-detail-actions{ display:flex; gap:8px; flex-shrink:0; }
+  .btn.ghost.danger{ color:var(--clay); border-color:rgba(168,92,63,0.35); }
+  .btn.ghost.danger:hover{ background:rgba(168,92,63,0.1); }
   .eyebrow{
     font-family:'IBM Plex Mono',monospace;
     font-size:11px;
@@ -234,6 +238,14 @@
   .week-card.clickable{ cursor:pointer; transition:box-shadow 0.15s ease, border-color 0.15s ease; }
   .week-card.clickable:hover{ border-color:var(--gold); box-shadow:0 1px 2px rgba(28,43,34,0.08), 0 6px 20px rgba(28,43,34,0.1); }
   .overview-edit-actions{ display:flex; gap:10px; margin-top:6px; }
+  .archived-weeks{ margin-top:26px; padding-top:18px; border-top:1px solid var(--line); }
+  .archived-weeks h3{ font-family:'Fraunces',serif; font-size:14px; font-weight:600; margin:0 0 10px 0; color:var(--ink-soft); }
+  .archived-week-row{
+    display:flex; justify-content:space-between; align-items:center; gap:10px;
+    padding:9px 12px; background:var(--panel); border:1px solid var(--line-soft); border-radius:8px; margin-bottom:6px;
+  }
+  .archived-week-row .name{ font-size:13px; }
+  .archived-week-row .name b{ font-family:'IBM Plex Mono',monospace; font-weight:600; color:var(--ink-soft); margin-right:8px; }
   .week-card .edit-field{ display:flex; flex-direction:column; gap:6px; }
   .week-card input[type=text].title-input{ font-family:'Fraunces',serif; font-size:16px; font-weight:600; width:100%; }
   .week-card textarea.desc-input{ font-family:'Inter',sans-serif; font-size:13px; width:100%; min-width:0; min-height:52px; }
@@ -263,6 +275,8 @@
     font-weight:600;
     margin:0 0 14px 0;
   }
+  .panel-head-row{ display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:14px; flex-wrap:wrap; }
+  .panel-head-row h3{ margin:0; }
   .form-row{ display:flex; gap:10px; flex-wrap:wrap; align-items:flex-end; }
   .field{ display:flex; flex-direction:column; gap:5px; }
   .field label{ font-size:11.5px; font-weight:600; color:var(--ink-soft); }
@@ -352,6 +366,47 @@
   .pulse-bar-track{ flex:1; height:9px; background:var(--panel-2); border-radius:6px; overflow:hidden;}
   .pulse-bar-fill{ height:100%; background:linear-gradient(90deg, var(--forest-light), var(--gold)); border-radius:6px;}
   .pulse-bar-row .v{ width:34px; text-align:right; font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:var(--ink-soft);}
+
+  .qr-panel{ margin-top:14px; }
+  .qr-panel-main{ display:flex; align-items:center; gap:18px; flex-wrap:wrap; margin-bottom:12px; }
+  .qr-box{ border-radius:10px; border:1px solid var(--line); width:140px; height:140px; overflow:hidden; flex-shrink:0; }
+  .qr-info{ font-size:12.5px; color:var(--ink-soft); word-break:break-all; max-width:340px; }
+  .qr-link{ margin-top:6px; font-family:'IBM Plex Mono',monospace; font-size:11.5px; font-weight:600; color:var(--forest); }
+  .qr-panel:fullscreen{
+    background:var(--paper); display:flex; flex-direction:column; align-items:center; justify-content:center;
+    width:100vw; height:100vh;
+  }
+  .qr-panel:fullscreen .qr-panel-main{ flex-direction:column; gap:28px; margin-bottom:0; }
+  .qr-panel:fullscreen .qr-box{ width:360px; height:360px; }
+  .qr-panel:fullscreen .qr-info{ max-width:720px; text-align:center; font-size:18px; }
+  .qr-panel:fullscreen .qr-link{ font-size:32px; margin-top:16px; }
+  .qr-panel:fullscreen #expandQrBtn{ display:none; }
+
+  .pulse-layout{ display:flex; gap:20px; align-items:flex-start; }
+  .pulse-main{ flex:1; min-width:0; }
+  .pulse-side{ width:300px; flex-shrink:0; position:sticky; top:20px; }
+  .preview-panel .hint{ font-size:12px; color:var(--ink-soft); line-height:1.5; margin:0 0 14px 0; }
+  .phone-frame{
+    width:100%; aspect-ratio:9/18; border-radius:22px; border:6px solid var(--ink);
+    overflow:hidden; background:#fff; box-shadow:var(--shadow);
+  }
+  .phone-frame iframe{ width:100%; height:100%; border:none; display:block; }
+  @media (max-width:900px){
+    .pulse-layout{ flex-direction:column; }
+    .pulse-side{ width:100%; position:static; }
+    .phone-frame{ max-width:300px; margin:0 auto; }
+  }
+
+  .word-cloud{ display:flex; flex-wrap:wrap; gap:8px 16px; align-items:baseline; padding:4px 2px 8px 2px; }
+  .word-cloud .word{ font-family:'Fraunces',serif; font-weight:600; line-height:1; cursor:default; }
+
+  .weather-report{ display:flex; flex-wrap:wrap; gap:16px; padding:4px 2px 8px 2px; }
+  .weather-card{
+    width:96px; display:flex; flex-direction:column; align-items:center; text-align:center; gap:6px;
+    padding:10px 6px; background:#fff; border:1px solid var(--line-soft); border-radius:10px;
+  }
+  .weather-icon{ width:44px; height:44px; }
+  .weather-text{ font-size:11px; color:var(--ink-soft); line-height:1.35; margin:0; word-break:break-word; }
 
   .entry-list{ display:flex; flex-direction:column; gap:8px; margin-top:14px; }
   .entry-item{
@@ -446,10 +501,6 @@
         <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 1v14M8 5 3 8m5-3 5 3M8 9l-4 3m4-3 4 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
         Overview
       </button>
-      <button class="nav-btn" data-view="roster">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="6" cy="5" r="2.4" stroke="currentColor" stroke-width="1.4"/><circle cx="12" cy="6.5" r="1.8" stroke="currentColor" stroke-width="1.4"/><path d="M1.5 14c0-2.8 2-4.4 4.5-4.4s4.5 1.6 4.5 4.4M10.5 9.8c2 0 3.5 1.3 3.5 3.6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
-        Roster &amp; Attendance
-      </button>
       <button class="nav-btn" data-view="pulse">
         <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M1 8h3l1.5-4L8 13l1.7-7L11 8h4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
         Pulse Checks
@@ -462,6 +513,10 @@
         <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 2.5h7.5L13 5v8.5H3z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M5.5 6h5M5.5 8.5h5M5.5 11h3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
         Resources
       </button>
+      <button class="nav-btn" data-view="roster">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="6" cy="5" r="2.4" stroke="currentColor" stroke-width="1.4"/><circle cx="12" cy="6.5" r="1.8" stroke="currentColor" stroke-width="1.4"/><path d="M1.5 14c0-2.8 2-4.4 4.5-4.4s4.5 1.6 4.5 4.4M10.5 9.8c2 0 3.5 1.3 3.5 3.6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        Roster &amp; Attendance
+      </button>
     </nav>
     <div class="sidebar-foot">
       <div class="save-status" id="saveStatus"><span class="save-dot"></span>Loading…</div>
@@ -473,13 +528,14 @@
     <!-- OVERVIEW -->
     <section class="view active" id="view-overview">
       <div class="view-head">
-        <p class="eyebrow">First eight weeks · Wednesdays · 60 minutes</p>
+        <p class="eyebrow" id="overviewEyebrow">Wednesdays · 60 minutes</p>
         <h2>Program overview</h2>
         <p>Establish site-specific routines and practices, build community, and make sure every teacher new to the classroom — or new to Ceiba — feels supported from day one.</p>
       </div>
       <div class="stat-row" id="overviewStats"></div>
       <div class="timeline" id="timeline"></div>
       <div class="overview-edit-actions" id="overviewEditActions"></div>
+      <div id="archivedWeeksSection"></div>
     </section>
 
     <!-- ROSTER -->
@@ -516,30 +572,63 @@
         <h2>Pulse checks</h2>
         <p>Live warm-up responses submitted by new teachers, straight from the warm-up page.</p>
       </div>
-      <div class="panel">
-        <h3>Responses logged, all weeks</h3>
-        <div class="pulse-bars" id="pulseTrend"></div>
-      </div>
-      <div class="panel">
-        <h3>Send this week's warm-up</h3>
-        <div class="week-select-row" id="pulseWeekChips"></div>
-        <div class="form-row">
-          <div class="field" style="flex:1;">
-            <label for="pulseStyle">Warm-up style</label>
-            <select id="pulseStyle"></select>
+      <div class="pulse-layout">
+        <div class="pulse-main">
+          <div class="panel">
+            <h3>Responses logged, all weeks</h3>
+            <div class="pulse-bars" id="pulseTrend"></div>
+          </div>
+          <div class="panel">
+            <h3>Send this week's warm-up</h3>
+            <div class="week-select-row" id="pulseWeekChips"></div>
+            <div class="form-row">
+              <div class="field" style="flex:1;">
+                <label for="pulseStyle">Warm-up style</label>
+                <select id="pulseStyle"></select>
+              </div>
+            </div>
+            <div class="form-row" id="thisOrThatRow" style="display:none;">
+              <div class="field" style="flex:1;">
+                <label for="thisOrThatPick">This or that prompt</label>
+                <select id="thisOrThatPick"></select>
+              </div>
+            </div>
+            <div class="qr-panel" id="qrExpandWrap">
+              <div class="qr-panel-main" id="qrWrap">
+                <div id="qrCanvas" class="qr-box"></div>
+                <div class="qr-info">
+                  Scan to open the warm-up, pre-set to this week and style — or type the link below.
+                  <div id="qrLink" class="qr-link"></div>
+                </div>
+              </div>
+              <button class="btn ghost" id="expandQrBtn">Expand ⤢</button>
+            </div>
+          </div>
+          <div class="panel" id="wordCloudPanel" style="display:none;">
+            <h3>Word cloud — one word check-in</h3>
+            <div class="word-cloud" id="wordCloud"></div>
+          </div>
+          <div class="panel" id="weatherPanel" style="display:none;">
+            <h3>Weather report</h3>
+            <div class="weather-report" id="weatherReport"></div>
+          </div>
+          <div class="panel">
+            <div class="panel-head-row">
+              <h3>Responses for this week</h3>
+              <button class="btn ghost danger" id="clearResponsesBtn">Clear this week's responses</button>
+            </div>
+            <div class="entry-list" id="pulseEntries"></div>
           </div>
         </div>
-        <div id="qrWrap" style="display:flex; align-items:center; gap:18px; margin-top:14px; flex-wrap:wrap;">
-          <div id="qrCanvas" style="border-radius:10px; border:1px solid var(--line); width:140px; height:140px; overflow:hidden;"></div>
-          <div style="font-size:12.5px; color:var(--ink-soft); word-break:break-all; max-width:340px;">
-            Scan to open the warm-up, pre-set to this week and style.
-            <div id="qrLink" style="margin-top:6px; font-family:'IBM Plex Mono',monospace; font-size:11.5px;"></div>
+        <div class="pulse-side">
+          <div class="panel preview-panel">
+            <h3>What teachers see</h3>
+            <p class="hint">The live warm-up page for the week and style selected above. You can fill it out yourself — it submits a real response.</p>
+            <div class="phone-frame">
+              <iframe id="teacherPreview" title="Teacher warm-up preview"></iframe>
+            </div>
           </div>
         </div>
-      </div>
-      <div class="panel">
-        <h3>Responses for this week</h3>
-        <div class="entry-list" id="pulseEntries"></div>
       </div>
     </section>
 
@@ -610,10 +699,16 @@
     <!-- WEEK DETAIL -->
     <section class="view" id="view-week-detail">
       <button class="back" id="backToOverview">← Back to overview</button>
-      <div class="view-head">
-        <p class="eyebrow" id="weekDetailEyebrow">Week</p>
-        <h2 id="weekDetailTitle"></h2>
-        <p id="weekDetailDesc"></p>
+      <div class="view-head week-detail-head">
+        <div>
+          <p class="eyebrow" id="weekDetailEyebrow">Week</p>
+          <h2 id="weekDetailTitle"></h2>
+          <p id="weekDetailDesc"></p>
+        </div>
+        <div class="week-detail-actions">
+          <button class="btn ghost" id="resetSessionBtn">Reset session</button>
+          <button class="btn ghost danger" id="archiveWeekBtn">Archive this week</button>
+        </div>
       </div>
       <div class="panel">
         <h3>Add a Slidedeck, Webpage, or Program Link</h3>
@@ -642,16 +737,8 @@
   const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
   const TEACHER_PAGE_URL = 'https://teacher-boot-camp.vercel.app/';
 
-  const WEEKS = [
-    { n:1, title:"Welcome and Orientation", desc:"Campus tour, introductions to key staff, logistics like schedules, copiers, and technology access." },
-    { n:2, title:"Classroom Routines and Procedures", desc:"Site-specific expectations for daily flow, attendance, and transitions." },
-    { n:3, title:"Grading and Gradebook Workflows", desc:"Grading norms, Synergy Gradebook walkthrough, and communicating grades to students." },
-    { n:4, title:"Parent and Guardian Communication", desc:"Norms for outreach, tools used, and handling difficult conversations." },
-    { n:5, title:"School Culture and Community Building", desc:"Values, traditions, and a social element — lunch with veteran teacher mentors." },
-    { n:6, title:"Curriculum and Instructional Resources", desc:"Overview of curriculum maps, shared resources, and instructional expectations." },
-    { n:7, title:"Classroom Management for Middle and High School", desc:"Practical strategies and troubleshooting common challenges." },
-    { n:8, title:"Reflection and Peer Share", desc:"New teachers share wins and struggles, feedback on the boot camp itself, and planning next steps." }
-  ];
+  let WEEKS = [];
+  let archivedWeeks = [];
 
   const STYLES = [
     { key:'one_word', name:'One word check-in' },
@@ -660,6 +747,19 @@
     { key:'muddiest_point', name:'Muddiest point' },
     { key:'rose_thorn_bud', name:'Rose / Thorn / Bud' },
     { key:'ask_anything', name:'Ask me anything' }
+  ];
+
+  const THIS_OR_THAT = [
+    { key:'coffee_tea', label:'Coffee or tea?' },
+    { key:'early_night', label:'Early bird or night owl?' },
+    { key:'beach_mountain', label:'Beach vacation or mountain retreat?' },
+    { key:'sweet_savory', label:'Sweet or savory breakfast?' },
+    { key:'book_movie', label:'Book or movie?' },
+    { key:'summer_winter', label:'Summer break or winter break?' },
+    { key:'whiteboard_smartboard', label:'Whiteboard or smartboard?' },
+    { key:'grade_school_home', label:'Grade papers at school or at home?' },
+    { key:'fieldtrip_speaker', label:'Field trip or guest speaker day?' },
+    { key:'quiet_collab', label:'Quiet planning period or collaborative planning period?' }
   ];
 
   let teachers = [];
@@ -671,20 +771,19 @@
   let pulseSelectedWeek = 1;
   let resourceSelectedWeek = 1;
   let qrSelectedStyle = STYLES[0].key;
+  let qrSelectedPick = THIS_OR_THAT[0].key;
   let weekDetailSelected = 1;
-
-  WEEKS.forEach(w=>{ resourcesByWeek[w.n] = []; responsesByWeek[w.n] = []; });
 
   async function loadAll(){
     setSaveStatus('Loading…');
-    const [teachersRes, attendanceRes, pairingsRes, resourcesRes, responsesRes, slidesRes, weekContentRes] = await Promise.all([
+    const [teachersRes, attendanceRes, pairingsRes, resourcesRes, responsesRes, slidesRes, weeksRes] = await Promise.all([
       sb.from('teachers').select('*').order('created_at'),
       sb.from('attendance').select('*'),
       sb.from('mentor_pairings').select('*').order('created_at'),
       sb.from('resources').select('*').order('created_at'),
       sb.from('warmup_responses').select('*').order('created_at', { ascending:false }),
       sb.from('week_slides').select('*').order('sort_order'),
-      sb.from('week_content').select('*')
+      sb.from('weeks').select('*').order('number')
     ]);
 
     teachers = teachersRes.data || [];
@@ -697,9 +796,15 @@
 
     pairings = pairingsRes.data || [];
 
-    WEEKS.forEach(w=>{ resourcesByWeek[w.n] = []; });
-    (resourcesRes.data || []).forEach(r=>{ resourcesByWeek[r.week].push(r); });
+    const allWeeks = weeksRes.data || [];
+    WEEKS = allWeeks.filter(w=>!w.archived).map(w=>({ n:w.number, title:w.title, desc:w.description }));
+    archivedWeeks = allWeeks.filter(w=>w.archived).map(w=>({ n:w.number, title:w.title, desc:w.description }));
 
+    resourcesByWeek = {};
+    WEEKS.forEach(w=>{ resourcesByWeek[w.n] = []; });
+    (resourcesRes.data || []).forEach(r=>{ if(resourcesByWeek[r.week]) resourcesByWeek[r.week].push(r); });
+
+    responsesByWeek = {};
     WEEKS.forEach(w=>{ responsesByWeek[w.n] = []; });
     (responsesRes.data || []).forEach(r=>{ if(responsesByWeek[r.week]) responsesByWeek[r.week].push(r); });
 
@@ -707,10 +812,8 @@
     WEEKS.forEach(w=>{ weekSlides[w.n] = []; });
     (slidesRes.data || []).forEach(s=>{ if(weekSlides[s.week]) weekSlides[s.week].push(s); });
 
-    (weekContentRes.data || []).forEach(c=>{
-      const w = WEEKS.find(w=>w.n===c.week);
-      if(w){ w.title = c.title; w.desc = c.description; }
-    });
+    if(!WEEKS.find(w=>w.n===pulseSelectedWeek)) pulseSelectedWeek = WEEKS.length ? WEEKS[0].n : 1;
+    if(!WEEKS.find(w=>w.n===resourceSelectedWeek)) resourceSelectedWeek = WEEKS.length ? WEEKS[0].n : 1;
 
     setSaveStatus('Synced');
   }
@@ -722,6 +825,8 @@
       responsesByWeek[r.week].unshift(r);
       renderPulseTrend();
       renderPulseEntries();
+      renderWordCloud();
+      renderWeatherReport();
       renderOverview();
     })
     .subscribe();
@@ -751,11 +856,54 @@
     location.hash = '';
   });
 
+  document.getElementById('resetSessionBtn').addEventListener('click', async ()=>{
+    const n = weekDetailSelected;
+    if(!confirm('Reset Week ' + n + '\'s session? This clears attendance, resources, and linked decks for this week only. Warm-up responses already submitted by teachers are kept. This cannot be undone.')) return;
+    setSaveStatus('Resetting…');
+    const [a, r, s] = await Promise.all([
+      sb.from('attendance').delete().eq('week', n),
+      sb.from('resources').delete().eq('week', n),
+      sb.from('week_slides').delete().eq('week', n)
+    ]);
+    if(a.error || r.error || s.error){ console.error(a.error || r.error || s.error); setSaveStatus('Save failed'); return; }
+    teachers.forEach(t=>{ if(attendanceMap[t.id]) delete attendanceMap[t.id][n]; });
+    resourcesByWeek[n] = [];
+    weekSlides[n] = [];
+    setSaveStatus('Synced');
+    renderRoster();
+    renderOverview();
+    renderResourceList();
+    renderWeekSlidesOrderActions();
+    renderWeekSlidesList();
+  });
+
+  document.getElementById('archiveWeekBtn').addEventListener('click', async ()=>{
+    const n = weekDetailSelected;
+    const lastOne = WEEKS.length === 1;
+    const msg = lastOne
+      ? 'Week ' + n + ' is the only active week left. Archiving it will leave the teacher warm-up page with nothing to select. Archive anyway?'
+      : 'Archive Week ' + n + '? It will disappear from the active list and the teacher warm-up page, but nothing is deleted — you can restore it later from the Overview page.';
+    if(!confirm(msg)) return;
+    setSaveStatus('Saving…');
+    const { error } = await sb.from('weeks').update({ archived:true }).eq('number', n);
+    if(error){ console.error(error); setSaveStatus('Save failed'); return; }
+    const w = WEEKS.find(w=>w.n===n);
+    WEEKS = WEEKS.filter(w=>w.n!==n);
+    archivedWeeks.push(w);
+    archivedWeeks.sort((a,b)=>a.n-b.n);
+    setSaveStatus('Synced');
+    location.hash = '';
+    renderOverview();
+    renderArchivedWeeks();
+    renderPulseChips();
+    renderResourceChips();
+  });
+
   let slidesReorderMode = false;
 
   function openWeekDetail(n){
     const w = WEEKS.find(w=>w.n===n);
-    if(!w) return;
+    if(!w){ showView('overview'); return; }
     weekDetailSelected = n;
     slidesReorderMode = false;
     document.getElementById('weekDetailEyebrow').textContent = 'Week ' + n;
@@ -907,8 +1055,8 @@
   });
 
   function routeFromHash(){
-    const m = location.hash.match(/^#week\/(\d)$/);
-    if(m && Number(m[1])>=1 && Number(m[1])<=8){
+    const m = location.hash.match(/^#week\/(\d+)$/);
+    if(m && WEEKS.find(w=>w.n===Number(m[1]))){
       openWeekDetail(Number(m[1]));
     } else {
       showView('overview');
@@ -918,6 +1066,8 @@
 
   // ---------- Overview ----------
   function renderOverview(){
+    document.getElementById('overviewEyebrow').textContent = WEEKS.length + (WEEKS.length===1 ? ' week' : ' weeks') + ' · Wednesdays · 60 minutes';
+
     const totalTeachers = teachers.length;
     const totalPossible = totalTeachers * WEEKS.length;
     let attended = 0;
@@ -936,7 +1086,7 @@
       <div class="stat-card"><div class="num">${totalPairings}</div><div class="lbl">Mentor pairings</div></div>
     `;
 
-    document.getElementById('timeline').innerHTML = WEEKS.map(w=>{
+    document.getElementById('timeline').innerHTML = (WEEKS.length===0 ? '<div class="empty">No active weeks. Use "Add a week" below to create one.</div>' : '') + WEEKS.map(w=>{
       const badge = weekSlides[w.n] && weekSlides[w.n].length ? `<div class="slides-badge">🔗 ${weekSlides[w.n].length} deck${weekSlides[w.n].length>1?'s':''} linked</div>` : '';
       const body = overviewEditMode
         ? `<div class="edit-field">
@@ -967,20 +1117,21 @@
     const wrap = document.getElementById('overviewEditActions');
     wrap.innerHTML = overviewEditMode
       ? '<button class="btn" id="saveWeeksBtn">Save changes</button><button class="btn ghost" id="cancelWeeksBtn">Cancel</button>'
-      : '<button class="btn ghost" id="editWeeksBtn">Edit weeks</button>';
+      : '<button class="btn ghost" id="editWeeksBtn">Edit weeks</button><button class="btn ghost" id="addWeekBtn">+ Add a week</button>';
 
     if(overviewEditMode){
       document.getElementById('saveWeeksBtn').addEventListener('click', async ()=>{
         const updates = WEEKS.map(w=>({
-          week: w.n,
+          number: w.n,
           title: document.querySelector(`[data-week-title="${w.n}"]`).value.trim() || w.title,
-          description: document.querySelector(`[data-week-desc="${w.n}"]`).value.trim() || w.desc
+          description: document.querySelector(`[data-week-desc="${w.n}"]`).value.trim() || w.desc,
+          archived: false
         }));
         setSaveStatus('Saving…');
-        const { error } = await sb.from('week_content').upsert(updates);
+        const { error } = await sb.from('weeks').upsert(updates);
         if(error){ console.error(error); setSaveStatus('Save failed'); return; }
         updates.forEach(u=>{
-          const w = WEEKS.find(w=>w.n===u.week);
+          const w = WEEKS.find(w=>w.n===u.number);
           w.title = u.title; w.desc = u.description;
         });
         setSaveStatus('Synced');
@@ -1000,7 +1151,60 @@
         renderOverviewEditActions();
         renderOverview();
       });
+      document.getElementById('addWeekBtn').addEventListener('click', async ()=>{
+        const usedNumbers = WEEKS.concat(archivedWeeks).map(w=>w.n);
+        const nextNumber = usedNumbers.length ? Math.max(...usedNumbers) + 1 : 1;
+        setSaveStatus('Saving…');
+        const { data, error } = await sb.from('weeks').insert({
+          number: nextNumber, title: 'New week', description: 'Add a description for this week.'
+        }).select().single();
+        if(error){ console.error(error); setSaveStatus('Save failed'); return; }
+        WEEKS.push({ n:data.number, title:data.title, desc:data.description });
+        resourcesByWeek[data.number] = [];
+        responsesByWeek[data.number] = [];
+        weekSlides[data.number] = [];
+        setSaveStatus('Synced');
+        overviewEditMode = true;
+        renderOverviewEditActions();
+        renderOverview();
+        renderPulseChips();
+        renderResourceChips();
+      });
     }
+  }
+
+  function renderArchivedWeeks(){
+    const wrap = document.getElementById('archivedWeeksSection');
+    if(archivedWeeks.length===0){ wrap.innerHTML = ''; return; }
+    wrap.innerHTML = `<div class="archived-weeks">
+      <h3>Archived weeks</h3>
+      ${archivedWeeks.map(w=>`
+        <div class="archived-week-row">
+          <div class="name"><b>Week ${w.n}</b>${escapeHtml(w.title)}</div>
+          <button class="btn ghost" data-restore-week="${w.n}">Restore</button>
+        </div>
+      `).join('')}
+    </div>`;
+    wrap.querySelectorAll('[data-restore-week]').forEach(b=>{
+      b.addEventListener('click', async ()=>{
+        const n = Number(b.dataset.restoreWeek);
+        setSaveStatus('Saving…');
+        const { error } = await sb.from('weeks').update({ archived:false }).eq('number', n);
+        if(error){ console.error(error); setSaveStatus('Save failed'); return; }
+        const w = archivedWeeks.find(w=>w.n===n);
+        archivedWeeks = archivedWeeks.filter(w=>w.n!==n);
+        WEEKS.push(w);
+        WEEKS.sort((a,b)=>a.n-b.n);
+        if(!resourcesByWeek[n]) resourcesByWeek[n] = [];
+        if(!responsesByWeek[n]) responsesByWeek[n] = [];
+        if(!weekSlides[n]) weekSlides[n] = [];
+        setSaveStatus('Synced');
+        renderOverview();
+        renderArchivedWeeks();
+        renderPulseChips();
+        renderResourceChips();
+      });
+    });
   }
 
   // ---------- Roster ----------
@@ -1088,7 +1292,10 @@
         pulseSelectedWeek = Number(c.dataset.pweek);
         renderPulseChips();
         renderPulseEntries();
+        renderWordCloud();
+        renderWeatherReport();
         generateQR();
+        updateTeacherPreview();
       });
     });
   }
@@ -1099,24 +1306,189 @@
     sel.value = qrSelectedStyle;
     sel.addEventListener('change', ()=>{
       qrSelectedStyle = sel.value;
+      renderThisOrThatPick();
       generateQR();
+      updateTeacherPreview();
     });
+
+    const pickSel = document.getElementById('thisOrThatPick');
+    pickSel.innerHTML = THIS_OR_THAT.map(p=>`<option value="${p.key}">${escapeHtml(p.label)}</option>`).join('');
+    pickSel.value = qrSelectedPick;
+    pickSel.addEventListener('change', ()=>{
+      qrSelectedPick = pickSel.value;
+      generateQR();
+      updateTeacherPreview();
+    });
+
+    renderThisOrThatPick();
+  }
+
+  function renderThisOrThatPick(){
+    document.getElementById('thisOrThatRow').style.display = qrSelectedStyle === 'this_or_that' ? '' : 'none';
+  }
+
+  function updateTeacherPreview(){
+    const iframe = document.getElementById('teacherPreview');
+    if(!iframe) return;
+    let url = TEACHER_PAGE_URL + '?week=' + pulseSelectedWeek + '&style=' + qrSelectedStyle;
+    if(qrSelectedStyle === 'this_or_that') url += '&pick=' + qrSelectedPick;
+    iframe.src = url;
+  }
+
+  function tokenizeWords(text){
+    return (text || '').toLowerCase()
+      .replace(/[^\p{L}\p{N}\s'-]/gu, ' ')
+      .split(/\s+/)
+      .map(w=>w.trim())
+      .filter(Boolean);
+  }
+
+  function renderWordCloud(){
+    const panel = document.getElementById('wordCloudPanel');
+    const entries = (responsesByWeek[pulseSelectedWeek] || []).filter(e=>e.style==='one_word');
+    const counts = {};
+    entries.forEach(e=>{
+      tokenizeWords(e.response).forEach(w=>{ counts[w] = (counts[w]||0) + 1; });
+    });
+    const words = Object.keys(counts);
+    if(words.length===0){ panel.style.display = 'none'; return; }
+    panel.style.display = '';
+
+    const max = Math.max(...words.map(w=>counts[w]));
+    const min = Math.min(...words.map(w=>counts[w]));
+    const wrap = document.getElementById('wordCloud');
+    wrap.innerHTML = words
+      .sort((a,b)=> counts[b]-counts[a] || a.localeCompare(b))
+      .map(w=>{
+        const t = max===min ? 1 : (counts[w]-min)/(max-min);
+        const size = Math.round(14 + t*26);
+        const tone = t>0.66 ? 'var(--forest)' : t>0.33 ? 'var(--forest-light)' : 'var(--ink-soft)';
+        const count = counts[w];
+        return `<span class="word" style="font-size:${size}px; color:${tone};" title="${count} time${count>1?'s':''}">${escapeHtml(w)}</span>`;
+      }).join('');
+  }
+
+  function cloudShape(color){
+    return `<g>
+      <ellipse cx="16" cy="27" rx="8" ry="6.5" fill="${color}"/>
+      <ellipse cx="26" cy="22" rx="10.5" ry="8.5" fill="${color}"/>
+      <ellipse cx="33" cy="27" rx="7.5" ry="6" fill="${color}"/>
+      <rect x="12" y="26" width="26" height="9" rx="4.5" fill="${color}"/>
+    </g>`;
+  }
+
+  function snowflake(cx, cy){
+    return `<g transform="translate(${cx},${cy})" stroke="var(--slate)" stroke-width="1.6" stroke-linecap="round">
+      <line x1="-3" y1="0" x2="3" y2="0"/><line x1="0" y1="-3" x2="0" y2="3"/>
+      <line x1="-2" y1="-2" x2="2" y2="2"/><line x1="-2" y1="2" x2="2" y2="-2"/>
+    </g>`;
+  }
+
+  const WEATHER_ICONS = {
+    sunny: `<circle cx="24" cy="22" r="9" fill="var(--gold)"/>
+      <g stroke="var(--gold)" stroke-width="2.5" stroke-linecap="round">
+        <line x1="24" y1="3" x2="24" y2="9"/><line x1="24" y1="35" x2="24" y2="41"/>
+        <line x1="5" y1="22" x2="11" y2="22"/><line x1="37" y1="22" x2="43" y2="22"/>
+        <line x1="10" y1="8" x2="14" y2="12"/><line x1="34" y1="32" x2="38" y2="36"/>
+        <line x1="10" y1="36" x2="14" y2="32"/><line x1="34" y1="12" x2="38" y2="8"/>
+      </g>`,
+    cloudy: cloudShape('var(--slate)'),
+    rain: cloudShape('var(--slate)') + `<g stroke="var(--forest-light)" stroke-width="2.5" stroke-linecap="round">
+        <line x1="17" y1="38" x2="14" y2="44"/><line x1="24" y1="38" x2="21" y2="44"/><line x1="31" y1="38" x2="28" y2="44"/>
+      </g>`,
+    storm: cloudShape('var(--ink)') + `<polygon points="26,35 19,44 24,44 21,48 30,38 25,38 27,34" fill="var(--gold)"/>`,
+    snow: cloudShape('var(--slate)') + snowflake(16,42) + snowflake(24,45) + snowflake(32,42),
+    wind: `<g stroke="var(--slate)" stroke-width="2.5" stroke-linecap="round">
+        <path d="M4 16 h26 a4 4 0 100-8"/>
+        <path d="M4 26 h34 a4 4 0 110 8 h-6"/>
+        <path d="M4 36 h20 a3.5 3.5 0 103.5-3.5"/>
+      </g>`,
+    fog: `<g stroke="var(--ink-soft)" stroke-width="3" stroke-linecap="round">
+        <line x1="6" y1="14" x2="42" y2="14" opacity="0.9"/>
+        <line x1="10" y1="22" x2="42" y2="22" opacity="0.75"/>
+        <line x1="6" y1="30" x2="38" y2="30" opacity="0.6"/>
+        <line x1="10" y1="38" x2="42" y2="38" opacity="0.45"/>
+      </g>`,
+    'partly-cloudy': `<circle cx="17" cy="15" r="7" fill="var(--gold)"/>
+      <g stroke="var(--gold)" stroke-width="2" stroke-linecap="round">
+        <line x1="17" y1="2" x2="17" y2="5"/><line x1="4" y1="15" x2="7" y2="15"/><line x1="7" y1="5" x2="9" y2="7"/>
+      </g>
+      ${cloudShape('var(--slate)')}`,
+    hot: `<circle cx="22" cy="18" r="9" fill="var(--clay)"/>
+      <g stroke="var(--clay)" stroke-width="2.5" stroke-linecap="round">
+        <line x1="22" y1="1" x2="22" y2="6"/><line x1="3" y1="18" x2="8" y2="18"/>
+        <line x1="8" y1="4" x2="11.5" y2="7.5"/><line x1="36" y1="4" x2="32.5" y2="7.5"/>
+      </g>
+      <g stroke="var(--gold)" stroke-width="2" stroke-linecap="round">
+        <path d="M12 38 q3 -6 0 -12"/><path d="M22 40 q3 -6 0 -12"/><path d="M32 38 q3 -6 0 -12"/>
+      </g>`,
+    cold: `<g stroke="var(--slate)" stroke-width="2.5" stroke-linecap="round">
+        <line x1="24" y1="4" x2="24" y2="44"/><line x1="6" y1="24" x2="42" y2="24"/>
+        <line x1="11" y1="11" x2="37" y2="37"/><line x1="11" y1="37" x2="37" y2="11"/>
+        <line x1="24" y1="4" x2="19" y2="9"/><line x1="24" y1="4" x2="29" y2="9"/>
+        <line x1="24" y1="44" x2="19" y2="39"/><line x1="24" y1="44" x2="29" y2="39"/>
+        <line x1="6" y1="24" x2="11" y2="19"/><line x1="6" y1="24" x2="11" y2="29"/>
+        <line x1="42" y1="24" x2="37" y2="19"/><line x1="42" y1="24" x2="37" y2="29"/>
+      </g>`,
+    mixed: cloudShape('var(--slate)') + `<path d="M36 6 l1.6 3.8 3.8 1.6 -3.8 1.6 -1.6 3.8 -1.6 -3.8 -3.8 -1.6 3.8 -1.6z" fill="var(--gold)"/>`
+  };
+
+  function weatherIconFor(text){
+    const t = (text || '').toLowerCase();
+    if(/thunder|storm|lightning/.test(t)) return 'storm';
+    if(/snow|blizzard|flurr/.test(t)) return 'snow';
+    if(/rain|shower|drizzle|pour/.test(t)) return 'rain';
+    if(/fog|mist|hazy|haze/.test(t)) return 'fog';
+    if(/partly cloudy|partly sunny|mix of sun/.test(t)) return 'partly-cloudy';
+    if(/cloud|overcast|gray|grey|dreary/.test(t)) return 'cloudy';
+    if(/hot|heat|scorching|blazing|sweltering/.test(t)) return 'hot';
+    if(/cold|freez|chilly|frost|frigid/.test(t)) return 'cold';
+    if(/sun|clear|bright|warm/.test(t)) return 'sunny';
+    if(/wind|breez|gust/.test(t)) return 'wind';
+    return 'mixed';
+  }
+
+  function renderWeatherReport(){
+    const panel = document.getElementById('weatherPanel');
+    const entries = (responsesByWeek[pulseSelectedWeek] || []).filter(e=>e.style==='weather');
+    if(entries.length===0){ panel.style.display = 'none'; return; }
+    panel.style.display = '';
+    const wrap = document.getElementById('weatherReport');
+    wrap.innerHTML = entries.map(e=>{
+      const icon = WEATHER_ICONS[weatherIconFor(e.response)];
+      return `<div class="weather-card">
+        <svg viewBox="0 0 48 48" fill="none" class="weather-icon">${icon}</svg>
+        <p class="weather-text">${escapeHtml(e.response)}</p>
+      </div>`;
+    }).join('');
   }
 
   let qrInstance = null;
-  function generateQR(){
-    const url = TEACHER_PAGE_URL + '?week=' + pulseSelectedWeek + '&style=' + qrSelectedStyle;
+  function generateQR(size){
+    size = size || 140;
+    let url = TEACHER_PAGE_URL + '?week=' + pulseSelectedWeek + '&style=' + qrSelectedStyle;
+    if(qrSelectedStyle === 'this_or_that') url += '&pick=' + qrSelectedPick;
     document.getElementById('qrLink').textContent = url;
     const holder = document.getElementById('qrCanvas');
     if(window.QRCode){
       holder.innerHTML = '';
       qrInstance = new QRCode(holder, {
-        text: url, width:140, height:140,
+        text: url, width:size, height:size,
         colorDark:'#1C2B22', colorLight:'#F7F8F3',
         correctLevel: QRCode.CorrectLevel.M
       });
     }
   }
+
+  document.getElementById('expandQrBtn').addEventListener('click', ()=>{
+    const el = document.getElementById('qrExpandWrap');
+    if(el.requestFullscreen) el.requestFullscreen().catch(err=>console.error('Fullscreen request failed', err));
+  });
+
+  document.addEventListener('fullscreenchange', ()=>{
+    const el = document.getElementById('qrExpandWrap');
+    generateQR(document.fullscreenElement === el ? 360 : 140);
+  });
 
   function renderPulseTrend(){
     const totalTeachers = teachers.length;
@@ -1149,6 +1521,23 @@
       </div>
     `).join('');
   }
+
+  document.getElementById('clearResponsesBtn').addEventListener('click', async ()=>{
+    const n = pulseSelectedWeek;
+    const count = (responsesByWeek[n] || []).length;
+    if(count === 0) return;
+    if(!confirm('Clear all ' + count + ' warm-up response' + (count>1?'s':'') + ' for Week ' + n + '? This deletes what teachers submitted — the word cloud, weather report, and response list will start fresh for this week. This cannot be undone.')) return;
+    setSaveStatus('Clearing…');
+    const { error } = await sb.from('warmup_responses').delete().eq('week', n);
+    if(error){ console.error(error); setSaveStatus('Save failed'); return; }
+    responsesByWeek[n] = [];
+    setSaveStatus('Synced');
+    renderPulseTrend();
+    renderPulseEntries();
+    renderWordCloud();
+    renderWeatherReport();
+    renderOverview();
+  });
 
   // ---------- Mentors ----------
   function renderMentorTeacherOptions(){
@@ -1296,12 +1685,16 @@
   function renderAll(){
     renderOverview();
     renderOverviewEditActions();
+    renderArchivedWeeks();
     renderRoster();
     renderPulseChips();
     renderPulseStyleSelect();
     renderPulseTrend();
     renderPulseEntries();
+    renderWordCloud();
+    renderWeatherReport();
     generateQR();
+    updateTeacherPreview();
     renderMentorTeacherOptions();
     renderPairings();
     renderResourceChips();

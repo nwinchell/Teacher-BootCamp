@@ -149,41 +149,30 @@
   const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
   const STYLES = [
-    { key:'one_word', name:'One word check-in', desc:'A single word for how you\'re walking in today.', prompt:'One word for how you\'re feeling', hint:'Just one word — first thing that comes to mind.' },
+    { key:'one_word', name:'One word check-in', desc:'A word or two (or a few) for how you\'re walking in today.', prompt:'Word(s) for how you\'re feeling', hint:'One word, five words — whatever captures it. No wrong answers.' },
     { key:'weather', name:'Weather report', desc:'If your week were weather, what would it be?', prompt:'Your weather report', hint:'e.g. "Partly cloudy with a chance of grading."' },
-    { key:'this_or_that', name:'This or that', desc:'A quick either/or, your call.', prompt:'This or that — your pick', hint:'e.g. "Coffee, because Mondays." Pick anything, explain in a sentence.' },
+    { key:'this_or_that', name:'This or that', desc:'A quick either/or, your call.', prompt:'This or that — your pick', hint:'Pick one and say why in a sentence.' },
     { key:'muddiest_point', name:'Muddiest point', desc:'What\'s still fuzzy from last week?', prompt:'What\'s still unclear?', hint:'No judgment — this helps shape today\'s session.' },
     { key:'rose_thorn_bud', name:'Rose / Thorn / Bud', desc:'One win, one struggle, one thing ahead.', prompt:'Your rose, thorn, and bud', hint:'One win (rose), one struggle (thorn), one thing you\'re looking forward to (bud).' },
     { key:'ask_anything', name:'Ask me anything', desc:'Drop a question or worry, anonymously.', prompt:'Your question', hint:'Anything on your mind — no names attached.' }
   ];
 
+  const THIS_OR_THAT = [
+    { key:'coffee_tea', label:'Coffee or tea?' },
+    { key:'early_night', label:'Early bird or night owl?' },
+    { key:'beach_mountain', label:'Beach vacation or mountain retreat?' },
+    { key:'sweet_savory', label:'Sweet or savory breakfast?' },
+    { key:'book_movie', label:'Book or movie?' },
+    { key:'summer_winter', label:'Summer break or winter break?' },
+    { key:'whiteboard_smartboard', label:'Whiteboard or smartboard?' },
+    { key:'grade_school_home', label:'Grade papers at school or at home?' },
+    { key:'fieldtrip_speaker', label:'Field trip or guest speaker day?' },
+    { key:'quiet_collab', label:'Quiet planning period or collaborative planning period?' }
+  ];
+
   let selectedWeek = null;
   let selectedStyle = null;
   let isLocked = false;
-
-  const params = new URLSearchParams(window.location.search);
-  const paramWeek = parseInt(params.get('week'), 10);
-  const paramStyle = params.get('style');
-  const matchedStyle = STYLES.find(s => s.key === paramStyle);
-  if(paramWeek >= 1 && paramWeek <= 8 && matchedStyle){
-    isLocked = true;
-    selectedWeek = paramWeek;
-    selectedStyle = matchedStyle;
-  }
-
-  const weekGrid = document.getElementById('weekGrid');
-  for(let w=1; w<=8; w++){
-    const b = document.createElement('button');
-    b.className = 'week-btn';
-    b.textContent = 'W' + w;
-    b.addEventListener('click', ()=>{
-      selectedWeek = w;
-      document.querySelectorAll('.week-btn').forEach(el=>el.classList.remove('active'));
-      b.classList.add('active');
-      document.getElementById('toStyleBtn').disabled = false;
-    });
-    weekGrid.appendChild(b);
-  }
 
   const styleList = document.getElementById('styleList');
   STYLES.forEach(s=>{
@@ -216,11 +205,6 @@
       document.getElementById('lockedBadgeText').textContent = 'Week ' + selectedWeek + ' · ' + selectedStyle.name;
     }
     showStep('step-response');
-  }
-
-  if(isLocked){
-    document.querySelector('header p').textContent = 'Your coordinator set today\'s warm-up — just type your answer.';
-    openResponseStep();
   }
 
   document.getElementById('toStyleBtn').addEventListener('click', ()=> showStep('step-style'));
@@ -261,6 +245,60 @@
     document.querySelectorAll('.style-btn').forEach(el=>el.classList.remove('active'));
     showStep('step-style');
   });
+
+  async function initWeeks(){
+    const weekGrid = document.getElementById('weekGrid');
+    weekGrid.innerHTML = '<p style="grid-column:1/-1; font-size:12.5px; color:var(--ink-soft); text-align:center; padding:8px 0;">Loading weeks…</p>';
+
+    const { data, error } = await sb.from('weeks').select('number').eq('archived', false).order('number');
+    if(error) console.error(error);
+    const activeWeeks = (data || []).map(w => w.number);
+
+    const params = new URLSearchParams(window.location.search);
+    const paramWeek = parseInt(params.get('week'), 10);
+    const paramStyle = params.get('style');
+    const paramPick = params.get('pick');
+    const matchedStyle = STYLES.find(s => s.key === paramStyle);
+    if(activeWeeks.includes(paramWeek) && matchedStyle){
+      isLocked = true;
+      selectedWeek = paramWeek;
+      selectedStyle = matchedStyle;
+      if(matchedStyle.key === 'this_or_that'){
+        const pick = THIS_OR_THAT.find(p => p.key === paramPick);
+        if(pick){
+          selectedStyle = Object.assign({}, matchedStyle, {
+            prompt: pick.label,
+            hint: 'Pick one and say why in a sentence — there\'s no wrong answer.'
+          });
+        }
+      }
+    }
+
+    if(activeWeeks.length === 0){
+      weekGrid.innerHTML = '<p style="grid-column:1/-1; font-size:12.5px; color:var(--ink-soft); text-align:center; padding:8px 0;">No weeks are open right now — check back later.</p>';
+    } else {
+      weekGrid.innerHTML = '';
+      activeWeeks.forEach(w=>{
+        const b = document.createElement('button');
+        b.className = 'week-btn';
+        b.textContent = 'W' + w;
+        b.addEventListener('click', ()=>{
+          selectedWeek = w;
+          document.querySelectorAll('.week-btn').forEach(el=>el.classList.remove('active'));
+          b.classList.add('active');
+          document.getElementById('toStyleBtn').disabled = false;
+        });
+        weekGrid.appendChild(b);
+      });
+    }
+
+    if(isLocked){
+      document.querySelector('header p').textContent = 'Your coordinator set today\'s warm-up — just type your answer.';
+      openResponseStep();
+    }
+  }
+
+  initWeeks();
 })();
 </script>
 </body>
