@@ -6,7 +6,7 @@
 <title>Ceiba New Teacher Boot Camp — Coordinator Dashboard</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Playfair+Display:wght@500;600;700&family=Source+Sans+3:wght@400;500;600;700&family=Merriweather:wght@400;700&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 <style>
@@ -26,13 +26,15 @@
     --line-soft:rgba(28,43,34,0.08);
     --shadow: 0 1px 2px rgba(28,43,34,0.06), 0 4px 16px rgba(28,43,34,0.06);
     --radius: 10px;
+    --font-display: 'Fraunces', serif;
+    --font-body: 'Inter', sans-serif;
   }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
   body{
     background:var(--paper);
     color:var(--ink);
-    font-family:'Inter',system-ui,sans-serif;
+    font-family:var(--font-body);
     -webkit-font-smoothing:antialiased;
     min-height:100vh;
   }
@@ -63,8 +65,10 @@
     margin-bottom:18px;
   }
   .brand svg{flex-shrink:0; margin-top:2px;}
+  #brandIcon{ flex-shrink:0; margin-top:2px; display:flex; }
+  #brandIcon img{ width:26px; height:26px; object-fit:contain; border-radius:5px; }
   .brand h1{
-    font-family:'Fraunces',serif;
+    font-family:var(--font-display);
     font-weight:600;
     font-size:19px;
     line-height:1.22;
@@ -85,7 +89,7 @@
     background:none;
     border:none;
     color:rgba(237,239,230,0.82);
-    font-family:'Inter',sans-serif;
+    font-family:var(--font-body);
     font-size:13.5px;
     font-weight:500;
     text-align:left;
@@ -119,7 +123,7 @@
     background:none;
     border:1px solid rgba(237,239,230,0.22);
     color:rgba(237,239,230,0.72);
-    font-family:'Inter',sans-serif;
+    font-family:var(--font-body);
     font-size:12px;
     padding:8px 10px;
     border-radius:7px;
@@ -142,9 +146,9 @@
     padding:32px 28px; box-shadow:var(--shadow);
   }
   .auth-brand{ display:flex; align-items:flex-start; gap:10px; margin-bottom:22px; }
-  .auth-brand h1{ font-family:'Fraunces',serif; font-weight:600; font-size:17px; margin:0 0 3px 0; color:var(--forest); }
+  .auth-brand h1{ font-family:var(--font-display); font-weight:600; font-size:17px; margin:0 0 3px 0; color:var(--forest); }
   .auth-brand p{ margin:0; font-size:11.5px; color:var(--ink-soft); }
-  .auth-card h2{ font-family:'Fraunces',serif; font-size:20px; font-weight:600; margin:0 0 4px 0; color:var(--forest); }
+  .auth-card h2{ font-family:var(--font-display); font-size:20px; font-weight:600; margin:0 0 4px 0; color:var(--forest); }
   .auth-sub{ font-size:12.5px; color:var(--ink-soft); margin:0 0 18px 0; line-height:1.5; }
   .auth-card .field{ margin-bottom:14px; display:flex; flex-direction:column; gap:5px; }
   .auth-card .field label{ font-size:11.5px; font-weight:600; color:var(--ink-soft); }
@@ -188,7 +192,7 @@
     margin:0 0 6px 0;
   }
   .view-head h2{
-    font-family:'Fraunces',serif;
+    font-family:var(--font-display);
     font-weight:600;
     font-size:28px;
     margin:0 0 8px 0;
@@ -264,7 +268,7 @@
     box-shadow:var(--shadow);
   }
   .week-card h3{
-    font-family:'Fraunces',serif;
+    font-family:var(--font-display);
     font-size:16px;
     font-weight:600;
     margin:0 0 5px 0;
@@ -275,7 +279,7 @@
   .week-card.clickable:hover{ border-color:var(--gold); box-shadow:0 1px 2px rgba(28,43,34,0.08), 0 6px 20px rgba(28,43,34,0.1); }
   .overview-edit-actions{ display:flex; gap:10px; margin-top:6px; }
   .archived-weeks{ margin-top:26px; padding-top:18px; border-top:1px solid var(--line); }
-  .archived-weeks h3{ font-family:'Fraunces',serif; font-size:14px; font-weight:600; margin:0 0 10px 0; color:var(--ink-soft); }
+  .archived-weeks h3{ font-family:var(--font-display); font-size:14px; font-weight:600; margin:0 0 10px 0; color:var(--ink-soft); }
   .archived-week-row{
     display:flex; justify-content:space-between; align-items:center; gap:10px;
     padding:9px 12px; background:var(--panel); border:1px solid var(--line-soft); border-radius:8px; margin-bottom:6px;
@@ -283,8 +287,8 @@
   .archived-week-row .name{ font-size:13px; }
   .archived-week-row .name b{ font-family:'IBM Plex Mono',monospace; font-weight:600; color:var(--ink-soft); margin-right:8px; }
   .week-card .edit-field{ display:flex; flex-direction:column; gap:6px; }
-  .week-card input[type=text].title-input{ font-family:'Fraunces',serif; font-size:16px; font-weight:600; width:100%; }
-  .week-card textarea.desc-input{ font-family:'Inter',sans-serif; font-size:13px; width:100%; min-width:0; min-height:52px; }
+  .week-card input[type=text].title-input{ font-family:var(--font-display); font-size:16px; font-weight:600; width:100%; }
+  .week-card textarea.desc-input{ font-family:var(--font-body); font-size:13px; width:100%; min-width:0; min-height:52px; }
   .week-card .slides-badge{
     display:inline-flex; align-items:center; gap:5px; margin-top:8px;
     font-family:'IBM Plex Mono',monospace; font-size:11px; font-weight:600;
@@ -306,7 +310,7 @@
     margin-bottom:20px;
   }
   .panel h3{
-    font-family:'Fraunces',serif;
+    font-family:var(--font-display);
     font-size:16px;
     font-weight:600;
     margin:0 0 14px 0;
@@ -317,7 +321,7 @@
   .field{ display:flex; flex-direction:column; gap:5px; }
   .field label{ font-size:11.5px; font-weight:600; color:var(--ink-soft); }
   input[type=text], input[type=date], input[type=url], select, textarea{
-    font-family:'Inter',sans-serif;
+    font-family:var(--font-body);
     font-size:13.5px;
     padding:8px 10px;
     border-radius:7px;
@@ -333,7 +337,7 @@
     border-color:var(--gold);
   }
   .btn{
-    font-family:'Inter',sans-serif;
+    font-family:var(--font-body);
     font-size:13px;
     font-weight:600;
     padding:9px 16px;
@@ -434,7 +438,7 @@
   }
 
   .word-cloud{ display:flex; flex-wrap:wrap; gap:8px 16px; align-items:baseline; padding:4px 2px 8px 2px; }
-  .word-cloud .word{ font-family:'Fraunces',serif; font-weight:600; line-height:1; cursor:default; }
+  .word-cloud .word{ font-family:var(--font-display); font-weight:600; line-height:1; cursor:default; }
 
   .weather-report{ display:flex; flex-wrap:wrap; gap:16px; padding:4px 2px 8px 2px; }
   .weather-card{
@@ -443,6 +447,46 @@
   }
   .weather-icon{ width:44px; height:44px; }
   .weather-text{ font-size:11px; color:var(--ink-soft); line-height:1.35; margin:0; word-break:break-word; }
+
+  /* ---------- Settings ---------- */
+  .theme-swatch-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:12px; }
+  .theme-swatch{
+    border:1.5px solid var(--line); border-radius:10px; padding:12px; cursor:pointer;
+    background:#fff; text-align:left;
+  }
+  .theme-swatch:hover{ border-color:var(--forest-light); }
+  .theme-swatch.active{ border-color:var(--forest); background:var(--panel); }
+  .theme-swatch .dots{ display:flex; gap:6px; margin-bottom:9px; }
+  .theme-swatch .dot{ width:18px; height:18px; border-radius:50%; border:1px solid rgba(0,0,0,0.08); }
+  .theme-swatch .name{ font-size:12.5px; font-weight:600; color:var(--ink); }
+
+  .custom-color-row{ display:flex; gap:18px; margin-top:16px; padding-top:16px; border-top:1px solid var(--line); flex-wrap:wrap; }
+  .custom-color-field{ display:flex; align-items:center; gap:10px; }
+  .custom-color-field label{ font-size:12.5px; font-weight:600; color:var(--ink-soft); }
+  .custom-color-field input[type=color]{
+    width:38px; height:38px; padding:0; border:1px solid var(--line); border-radius:8px; cursor:pointer; background:none;
+  }
+
+  .font-option-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(190px,1fr)); gap:12px; }
+  .font-option{
+    border:1.5px solid var(--line); border-radius:10px; padding:14px; cursor:pointer; background:#fff; text-align:left;
+  }
+  .font-option:hover{ border-color:var(--forest-light); }
+  .font-option.active{ border-color:var(--forest); background:var(--panel); }
+  .font-option .sample-display{ font-size:19px; font-weight:600; margin-bottom:4px; color:var(--ink); }
+  .font-option .sample-body{ font-size:12px; color:var(--ink-soft); }
+
+  .logo-preview-row{ display:flex; align-items:center; gap:14px; margin-top:14px; }
+  .logo-preview{
+    width:56px; height:56px; border-radius:10px; border:1px solid var(--line); background:var(--panel);
+    display:flex; align-items:center; justify-content:center; overflow:hidden; flex-shrink:0;
+  }
+  .logo-preview img{ width:100%; height:100%; object-fit:contain; }
+  .logo-preview .placeholder{ font-size:10px; color:var(--ink-soft); text-align:center; padding:4px; }
+
+  #settingsSaveBtn{ margin-top:4px; }
+  #settingsSaveMsg{ margin-top:12px; }
+  #settingsSaveMsg:empty{ display:none; }
 
   .entry-list{ display:flex; flex-direction:column; gap:8px; margin-top:14px; }
   .entry-item{
@@ -478,7 +522,7 @@
   }
   .slides-deck-body{ flex:1; min-width:0; }
   .slides-deck-head{ display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:10px; }
-  .slides-deck-head h4{ font-family:'Fraunces',serif; font-size:15px; font-weight:600; margin:0; }
+  .slides-deck-head h4{ font-family:var(--font-display); font-size:15px; font-weight:600; margin:0; }
   .slides-deck-actions{ display:flex; gap:8px; flex-shrink:0; }
   .slides-deck iframe, .slides-deck img.generic-embed{
     width:100%; aspect-ratio:16/9; border:1px solid var(--line); border-radius:8px; display:block;
@@ -511,7 +555,7 @@
   /* ---------- Picker ---------- */
   .picker-stage{ display:flex; flex-direction:column; align-items:center; gap:18px; padding:10px 0 4px 0; }
   .picker-result{
-    font-family:'Fraunces',serif; font-size:19px; font-weight:600; color:var(--forest);
+    font-family:var(--font-display); font-size:19px; font-weight:600; color:var(--forest);
     min-height:28px; text-align:center;
   }
   .picker-result .lbl{
@@ -541,7 +585,7 @@
     box-shadow:var(--shadow); display:flex; align-items:center; justify-content:center;
     padding:28px; text-align:center;
   }
-  .dice-box span{ font-family:'Fraunces',serif; font-weight:600; font-size:48px; color:var(--ink); line-height:1.25; }
+  .dice-box span{ font-family:var(--font-display); font-weight:600; font-size:48px; color:var(--ink); line-height:1.25; }
   .dice-box.rolling{ animation:diceWobble 0.28s ease-in-out infinite; }
   .dice-box.settled{ animation:diceSettle 0.4s ease; }
   @keyframes diceWobble{
@@ -627,13 +671,15 @@
 <div class="app" id="appRoot" style="display:none;">
   <aside class="sidebar">
     <div class="brand">
-      <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
-        <path d="M13 3 L13 23 M13 8 Q7 10 5 15 M13 8 Q19 10 21 15 M13 13 Q8 15 6 20 M13 13 Q18 15 20 20" stroke="#EAD3A0" stroke-width="1.6" stroke-linecap="round"/>
-        <circle cx="13" cy="4.5" r="2.4" fill="#C99A3E"/>
-      </svg>
+      <span id="brandIcon">
+        <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
+          <path d="M13 3 L13 23 M13 8 Q7 10 5 15 M13 8 Q19 10 21 15 M13 13 Q8 15 6 20 M13 13 Q18 15 20 20" stroke="#EAD3A0" stroke-width="1.6" stroke-linecap="round"/>
+          <circle cx="13" cy="4.5" r="2.4" fill="#C99A3E"/>
+        </svg>
+      </span>
       <div>
         <h1>New Teacher Boot Camp</h1>
-        <p>Ceiba · Coordinator Dashboard</p>
+        <p><span id="brandSchoolName">Ceiba</span> · Coordinator Dashboard</p>
       </div>
     </div>
     <nav>
@@ -656,6 +702,10 @@
       <button class="nav-btn" data-view="roster">
         <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="6" cy="5" r="2.4" stroke="currentColor" stroke-width="1.4"/><circle cx="12" cy="6.5" r="1.8" stroke="currentColor" stroke-width="1.4"/><path d="M1.5 14c0-2.8 2-4.4 4.5-4.4s4.5 1.6 4.5 4.4M10.5 9.8c2 0 3.5 1.3 3.5 3.6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
         Roster &amp; Attendance
+      </button>
+      <button class="nav-btn" data-view="settings">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="2.2" stroke="currentColor" stroke-width="1.4"/><path d="M8 1.5v1.6M8 12.9v1.6M14.5 8h-1.6M3.1 8H1.5M12.4 3.6l-1.1 1.1M4.7 11.3l-1.1 1.1M12.4 12.4l-1.1-1.1M4.7 4.7 3.6 3.6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        Settings
       </button>
     </nav>
     <div class="sidebar-foot">
@@ -874,6 +924,53 @@
       <div class="slides-order-actions" id="weekSlidesOrderActions"></div>
       <div id="weekSlidesList"></div>
     </section>
+
+    <!-- SETTINGS -->
+    <section class="view" id="view-settings">
+      <div class="view-head">
+        <p class="eyebrow">Shared across all coordinators</p>
+        <h2>Settings</h2>
+        <p>Customize how the dashboard looks — everyone who signs in sees the same branding.</p>
+      </div>
+
+      <div class="panel">
+        <h3>School name</h3>
+        <div class="form-row">
+          <div class="field" style="flex:1;">
+            <label for="settingsSchoolName">Shown next to "Coordinator Dashboard" in the sidebar</label>
+            <input type="text" id="settingsSchoolName" placeholder="Ceiba">
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3>School icon</h3>
+        <div class="form-row">
+          <div class="field" style="flex:1;">
+            <label for="settingsLogoUrl">Logo image URL</label>
+            <input type="url" id="settingsLogoUrl" placeholder="https://…">
+          </div>
+        </div>
+        <div class="logo-preview-row">
+          <div class="logo-preview" id="settingsLogoPreview"></div>
+          <button class="btn ghost" id="settingsRemoveLogoBtn">Remove logo, use default icon</button>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3>Color scheme</h3>
+        <div class="theme-swatch-grid" id="themeSwatchGrid"></div>
+        <div id="customColorRow"></div>
+      </div>
+
+      <div class="panel">
+        <h3>Font</h3>
+        <div class="font-option-grid" id="fontOptionGrid"></div>
+      </div>
+
+      <button class="btn" id="settingsSaveBtn">Save settings</button>
+      <div class="picker-result" id="settingsSaveMsg"></div>
+    </section>
   </main>
 </div>
 
@@ -908,6 +1005,261 @@
     { key:'fieldtrip_speaker', label:'Field trip or guest speaker day?' },
     { key:'quiet_collab', label:'Quiet planning period or collaborative planning period?' }
   ];
+
+  const THEME_PRESETS = [
+    { key:'forest', name:'Forest', vars:{
+      ink:'#1C2B22', 'ink-soft':'#3C4C42', paper:'#EEF1E9', panel:'#F7F8F3', 'panel-2':'#E4E8DA',
+      forest:'#2F4F3A', 'forest-light':'#4A7057', gold:'#C99A3E', 'gold-light':'#EAD3A0',
+      slate:'#3E5566', clay:'#A85C3F', line:'rgba(28,43,34,0.14)', 'line-soft':'rgba(28,43,34,0.08)'
+    }},
+    { key:'ocean', name:'Ocean', vars:{
+      ink:'#12232B', 'ink-soft':'#33505C', paper:'#EAF2F1', panel:'#F5F9F8', 'panel-2':'#DCE8E6',
+      forest:'#1F4E5F', 'forest-light':'#3E7688', gold:'#C77B3E', 'gold-light':'#EAC9A8',
+      slate:'#3E5566', clay:'#A85C3F', line:'rgba(18,35,43,0.14)', 'line-soft':'rgba(18,35,43,0.08)'
+    }},
+    { key:'terracotta', name:'Terracotta', vars:{
+      ink:'#2B1F19', 'ink-soft':'#5C4A3C', paper:'#F3ECE3', panel:'#FAF6F0', 'panel-2':'#EBDFD0',
+      forest:'#8A4A32', 'forest-light':'#B06A4A', gold:'#C99A3E', 'gold-light':'#EAD3A0',
+      slate:'#6B5847', clay:'#A85C3F', line:'rgba(43,31,25,0.14)', 'line-soft':'rgba(43,31,25,0.08)'
+    }},
+    { key:'slate', name:'Slate', vars:{
+      ink:'#1E2226', 'ink-soft':'#4A5058', paper:'#EDEEF0', panel:'#F7F8F9', 'panel-2':'#DFE2E6',
+      forest:'#33404D', 'forest-light':'#59697A', gold:'#8C7B4A', 'gold-light':'#DCD3B8',
+      slate:'#4A5568', clay:'#8A5A4A', line:'rgba(30,34,38,0.14)', 'line-soft':'rgba(30,34,38,0.08)'
+    }},
+    { key:'berry', name:'Berry', vars:{
+      ink:'#2B1B24', 'ink-soft':'#5C4351', paper:'#F3E9EE', panel:'#FAF4F7', 'panel-2':'#EAD9E1',
+      forest:'#6B2D4D', 'forest-light':'#8F4C6E', gold:'#C99A3E', 'gold-light':'#EAD3A0',
+      slate:'#5B4A5C', clay:'#A85C3F', line:'rgba(43,27,36,0.14)', 'line-soft':'rgba(43,27,36,0.08)'
+    }},
+    { key:'custom', name:'Custom' }
+  ];
+
+  const FONT_PRESETS = [
+    { key:'fraunces_inter', name:'Fraunces + Inter', display:"'Fraunces', serif", body:"'Inter', sans-serif" },
+    { key:'playfair_source', name:'Playfair + Source Sans', display:"'Playfair Display', serif", body:"'Source Sans 3', sans-serif" },
+    { key:'merriweather_work', name:'Merriweather + Work Sans', display:"'Merriweather', serif", body:"'Work Sans', sans-serif" },
+    { key:'system', name:'System default', display:"-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", body:"-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" }
+  ];
+
+  function hexToHsl(hex){
+    let r = parseInt(hex.slice(1,3),16)/255, g = parseInt(hex.slice(3,5),16)/255, b = parseInt(hex.slice(5,7),16)/255;
+    const max = Math.max(r,g,b), min = Math.min(r,g,b);
+    let h,s,l = (max+min)/2;
+    if(max===min){ h=s=0; }
+    else{
+      const d = max-min;
+      s = l>0.5 ? d/(2-max-min) : d/(max+min);
+      switch(max){
+        case r: h=(g-b)/d+(g<b?6:0); break;
+        case g: h=(b-r)/d+2; break;
+        default: h=(r-g)/d+4;
+      }
+      h/=6;
+    }
+    return [h*360, s*100, l*100];
+  }
+  function hslToHex(h,s,l){
+    h/=360; s/=100; l/=100;
+    let r,g,b;
+    if(s===0){ r=g=b=l; }
+    else{
+      const hue2rgb=(p,q,t)=>{
+        if(t<0) t+=1; if(t>1) t-=1;
+        if(t<1/6) return p+(q-p)*6*t;
+        if(t<1/2) return q;
+        if(t<2/3) return p+(q-p)*(2/3-t)*6;
+        return p;
+      };
+      const q = l<0.5 ? l*(1+s) : l+s-l*s;
+      const p = 2*l-q;
+      r = hue2rgb(p,q,h+1/3); g = hue2rgb(p,q,h); b = hue2rgb(p,q,h-1/3);
+    }
+    const toHex = v => Math.round(v*255).toString(16).padStart(2,'0');
+    return '#'+toHex(r)+toHex(g)+toHex(b);
+  }
+  function lighten(hex, amount){
+    const [h,s,l] = hexToHsl(hex);
+    return hslToHex(h, s, Math.min(96, l+amount));
+  }
+
+  function applyTheme(preset, primaryColor, accentColor){
+    let vars;
+    if(preset === 'custom' && primaryColor && accentColor){
+      vars = {
+        ink:'#1C2B22', 'ink-soft':'#3C4C42', paper:'#EEF1E9', panel:'#F7F8F3', 'panel-2':'#E4E8DA',
+        forest:primaryColor, 'forest-light':lighten(primaryColor,18),
+        gold:accentColor, 'gold-light':lighten(accentColor,28),
+        slate:'#3E5566', clay:'#A85C3F', line:'rgba(28,43,34,0.14)', 'line-soft':'rgba(28,43,34,0.08)'
+      };
+    } else {
+      const p = THEME_PRESETS.find(t=>t.key===preset) || THEME_PRESETS[0];
+      vars = p.vars || THEME_PRESETS[0].vars;
+    }
+    Object.keys(vars).forEach(k=>{
+      document.documentElement.style.setProperty('--'+k, vars[k]);
+    });
+  }
+
+  function applyFont(preset){
+    const f = FONT_PRESETS.find(f=>f.key===preset) || FONT_PRESETS[0];
+    document.documentElement.style.setProperty('--font-display', f.display);
+    document.documentElement.style.setProperty('--font-body', f.body);
+  }
+
+  function applyLogo(logoUrl){
+    const icon = document.getElementById('brandIcon');
+    if(logoUrl){
+      icon.innerHTML = '<img src="'+escapeAttr(logoUrl)+'" alt="School logo">';
+    } else {
+      icon.innerHTML = '<svg width="26" height="26" viewBox="0 0 26 26" fill="none">'
+        + '<path d="M13 3 L13 23 M13 8 Q7 10 5 15 M13 8 Q19 10 21 15 M13 13 Q8 15 6 20 M13 13 Q18 15 20 20" stroke="#EAD3A0" stroke-width="1.6" stroke-linecap="round"/>'
+        + '<circle cx="13" cy="4.5" r="2.4" fill="#C99A3E"/></svg>';
+    }
+  }
+
+  function applySchoolName(name){
+    document.getElementById('brandSchoolName').textContent = name || 'Ceiba';
+  }
+
+  let dashboardSettings = { theme_preset:'forest', primary_color:null, accent_color:null, font_preset:'fraunces_inter', logo_url:null, school_name:null };
+  let settingsSelectedTheme = 'forest';
+  let settingsSelectedFont = 'fraunces_inter';
+  let settingsCustomPrimary = '#2F4F3A';
+  let settingsCustomAccent = '#C99A3E';
+
+  async function loadAndApplySettings(){
+    const { data, error } = await sb.from('dashboard_settings').select('*').eq('id', 1).single();
+    if(!error && data) dashboardSettings = data;
+    applyTheme(dashboardSettings.theme_preset, dashboardSettings.primary_color, dashboardSettings.accent_color);
+    applyFont(dashboardSettings.font_preset);
+    applyLogo(dashboardSettings.logo_url);
+    applySchoolName(dashboardSettings.school_name);
+  }
+
+  function renderLogoPreview(url){
+    const el = document.getElementById('settingsLogoPreview');
+    el.innerHTML = url ? '<img src="'+escapeAttr(url)+'" alt="Logo preview">' : '<div class="placeholder">No logo</div>';
+  }
+
+  function renderThemeSwatches(){
+    const wrap = document.getElementById('themeSwatchGrid');
+    wrap.innerHTML = THEME_PRESETS.map(p=>{
+      const dots = p.key === 'custom'
+        ? `<div class="dot" style="background:${settingsCustomPrimary};"></div><div class="dot" style="background:${settingsCustomAccent};"></div>`
+        : `<div class="dot" style="background:${p.vars.forest};"></div><div class="dot" style="background:${p.vars.gold};"></div><div class="dot" style="background:${p.vars.paper};"></div>`;
+      return `<div class="theme-swatch ${p.key===settingsSelectedTheme?'active':''}" data-theme-key="${p.key}">
+        <div class="dots">${dots}</div>
+        <div class="name">${escapeHtml(p.name)}</div>
+      </div>`;
+    }).join('');
+    wrap.querySelectorAll('[data-theme-key]').forEach(el=>{
+      el.addEventListener('click', ()=>{
+        settingsSelectedTheme = el.dataset.themeKey;
+        renderThemeSwatches();
+        renderCustomColorRow();
+        applyTheme(settingsSelectedTheme, settingsCustomPrimary, settingsCustomAccent);
+      });
+    });
+  }
+
+  function renderCustomColorRow(){
+    const wrap = document.getElementById('customColorRow');
+    if(settingsSelectedTheme !== 'custom'){ wrap.innerHTML = ''; return; }
+    wrap.innerHTML = `<div class="custom-color-row">
+      <div class="custom-color-field">
+        <label for="customPrimaryColor">Primary</label>
+        <input type="color" id="customPrimaryColor" value="${settingsCustomPrimary}">
+      </div>
+      <div class="custom-color-field">
+        <label for="customAccentColor">Accent</label>
+        <input type="color" id="customAccentColor" value="${settingsCustomAccent}">
+      </div>
+    </div>`;
+    document.getElementById('customPrimaryColor').addEventListener('input', (e)=>{
+      settingsCustomPrimary = e.target.value;
+      renderThemeSwatches();
+      applyTheme('custom', settingsCustomPrimary, settingsCustomAccent);
+    });
+    document.getElementById('customAccentColor').addEventListener('input', (e)=>{
+      settingsCustomAccent = e.target.value;
+      renderThemeSwatches();
+      applyTheme('custom', settingsCustomPrimary, settingsCustomAccent);
+    });
+  }
+
+  function renderFontOptions(){
+    const wrap = document.getElementById('fontOptionGrid');
+    wrap.innerHTML = FONT_PRESETS.map(f=>`
+      <div class="font-option ${f.key===settingsSelectedFont?'active':''}" data-font-key="${f.key}">
+        <div class="sample-display" style="font-family:${f.display};">Aa</div>
+        <div class="sample-body" style="font-family:${f.body};">${escapeHtml(f.name)}</div>
+      </div>
+    `).join('');
+    wrap.querySelectorAll('[data-font-key]').forEach(el=>{
+      el.addEventListener('click', ()=>{
+        settingsSelectedFont = el.dataset.fontKey;
+        renderFontOptions();
+        applyFont(settingsSelectedFont);
+      });
+    });
+  }
+
+  function renderSettingsView(){
+    settingsSelectedTheme = dashboardSettings.theme_preset || 'forest';
+    settingsSelectedFont = dashboardSettings.font_preset || 'fraunces_inter';
+    settingsCustomPrimary = dashboardSettings.primary_color || '#2F4F3A';
+    settingsCustomAccent = dashboardSettings.accent_color || '#C99A3E';
+
+    document.getElementById('settingsSchoolName').value = dashboardSettings.school_name || '';
+    document.getElementById('settingsLogoUrl').value = dashboardSettings.logo_url || '';
+    renderLogoPreview(dashboardSettings.logo_url);
+
+    renderThemeSwatches();
+    renderCustomColorRow();
+    renderFontOptions();
+  }
+
+  document.getElementById('settingsLogoUrl').addEventListener('input', (e)=>{
+    renderLogoPreview(e.target.value.trim());
+  });
+
+  document.getElementById('settingsRemoveLogoBtn').addEventListener('click', ()=>{
+    document.getElementById('settingsLogoUrl').value = '';
+    renderLogoPreview('');
+    applyLogo('');
+  });
+
+  document.getElementById('settingsSaveBtn').addEventListener('click', async ()=>{
+    const schoolName = document.getElementById('settingsSchoolName').value.trim();
+    const logoUrl = document.getElementById('settingsLogoUrl').value.trim();
+    const btn = document.getElementById('settingsSaveBtn');
+    const msg = document.getElementById('settingsSaveMsg');
+    btn.disabled = true;
+    const update = {
+      theme_preset: settingsSelectedTheme,
+      primary_color: settingsSelectedTheme === 'custom' ? settingsCustomPrimary : null,
+      accent_color: settingsSelectedTheme === 'custom' ? settingsCustomAccent : null,
+      font_preset: settingsSelectedFont,
+      logo_url: logoUrl || null,
+      school_name: schoolName || null,
+      updated_at: new Date().toISOString()
+    };
+    const { error } = await sb.from('dashboard_settings').update(update).eq('id', 1);
+    if(error){
+      console.error(error);
+      msg.textContent = 'Save failed.';
+    } else {
+      dashboardSettings = Object.assign({}, dashboardSettings, update);
+      applyTheme(update.theme_preset, update.primary_color, update.accent_color);
+      applyFont(update.font_preset);
+      applyLogo(update.logo_url);
+      applySchoolName(update.school_name);
+      msg.textContent = 'Settings saved.';
+    }
+    btn.disabled = false;
+    setTimeout(()=>{ msg.textContent = ''; }, 3000);
+  });
 
   let teachers = [];
   let attendanceMap = {};
@@ -2035,6 +2387,7 @@
     renderPairings();
     renderResourceChips();
     renderResourceList();
+    renderSettingsView();
   }
 
   // ---------- Auth ----------
@@ -2178,6 +2531,8 @@
       showAuthGate();
     }
   });
+
+  loadAndApplySettings();
 })();
 </script>
 </body>
