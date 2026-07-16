@@ -126,6 +126,42 @@
     cursor:pointer;
   }
   .reset-btn:hover{ border-color:rgba(237,239,230,0.45); color:#fff; }
+  #signOutBtn{ margin-bottom:8px; }
+  .signed-in-as{
+    font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:rgba(237,239,230,0.55);
+    padding:0 6px 8px 6px; word-break:break-all;
+  }
+
+  /* ---------- Auth gate ---------- */
+  .auth-gate{
+    position:fixed; inset:0; background:var(--paper); display:flex; align-items:center; justify-content:center;
+    padding:24px; z-index:100;
+  }
+  .auth-card{
+    width:100%; max-width:360px; background:var(--panel); border:1px solid var(--line-soft); border-radius:16px;
+    padding:32px 28px; box-shadow:var(--shadow);
+  }
+  .auth-brand{ display:flex; align-items:flex-start; gap:10px; margin-bottom:22px; }
+  .auth-brand h1{ font-family:'Fraunces',serif; font-weight:600; font-size:17px; margin:0 0 3px 0; color:var(--forest); }
+  .auth-brand p{ margin:0; font-size:11.5px; color:var(--ink-soft); }
+  .auth-card h2{ font-family:'Fraunces',serif; font-size:20px; font-weight:600; margin:0 0 4px 0; color:var(--forest); }
+  .auth-sub{ font-size:12.5px; color:var(--ink-soft); margin:0 0 18px 0; line-height:1.5; }
+  .auth-card .field{ margin-bottom:14px; display:flex; flex-direction:column; gap:5px; }
+  .auth-card .field label{ font-size:11.5px; font-weight:600; color:var(--ink-soft); }
+  .auth-card input{ width:100%; }
+  .auth-msg{ font-size:12px; padding:9px 12px; border-radius:8px; margin-bottom:14px; line-height:1.5; }
+  .auth-msg.error{ background:rgba(168,92,63,0.1); color:var(--clay); }
+  .auth-msg.success{ background:var(--gold-light); color:#5a4419; }
+  .auth-toggle{
+    display:block; width:100%; text-align:center; background:none; border:none; color:var(--forest);
+    font-size:12.5px; font-weight:600; cursor:pointer; margin-top:14px; padding:6px;
+  }
+  .auth-toggle:hover{ text-decoration:underline; }
+  .auth-forgot{
+    display:block; width:100%; text-align:center; background:none; border:none; color:var(--ink-soft);
+    font-size:11.5px; cursor:pointer; margin-top:10px; padding:4px;
+  }
+  .auth-forgot:hover{ color:var(--forest); text-decoration:underline; }
 
   /* ---------- Main ---------- */
   main{
@@ -472,6 +508,81 @@
   }
   .week-chip.active{ background:var(--forest); border-color:var(--forest); color:#fff; }
 
+  /* ---------- Picker ---------- */
+  .picker-stage{ display:flex; flex-direction:column; align-items:center; gap:18px; padding:10px 0 4px 0; }
+  .picker-result{
+    font-family:'Fraunces',serif; font-size:19px; font-weight:600; color:var(--forest);
+    min-height:28px; text-align:center;
+  }
+  .picker-result .lbl{
+    display:block; font-family:'IBM Plex Mono',monospace; font-size:11px; font-weight:600;
+    letter-spacing:0.06em; text-transform:uppercase; color:var(--ink-soft); margin-bottom:4px;
+  }
+
+  /* Wheel */
+  .wheel-outer{ position:relative; width:260px; height:260px; }
+  .wheel-pointer{
+    position:absolute; top:-6px; left:50%; transform:translateX(-50%);
+    width:0; height:0; border-left:11px solid transparent; border-right:11px solid transparent;
+    border-top:18px solid var(--clay); z-index:2; filter:drop-shadow(0 1px 1px rgba(0,0,0,0.15));
+  }
+  .wheel-svg{
+    width:100%; height:100%; border-radius:50%; box-shadow:var(--shadow);
+    transition:transform 4s cubic-bezier(0.17,0.67,0.13,1);
+  }
+  .wheel-hub{
+    position:absolute; top:50%; left:50%; width:22px; height:22px; margin:-11px 0 0 -11px;
+    background:#fff; border:2px solid var(--forest); border-radius:50%; z-index:2;
+  }
+
+  /* Dice */
+  .dice-box{
+    width:420px; height:420px; max-width:90vw; max-height:90vw; border-radius:40px; background:#fff; border:1px solid var(--line);
+    box-shadow:var(--shadow); display:flex; align-items:center; justify-content:center;
+    padding:28px; text-align:center;
+  }
+  .dice-box span{ font-family:'Fraunces',serif; font-weight:600; font-size:48px; color:var(--ink); line-height:1.25; }
+  .dice-box.rolling{ animation:diceWobble 0.28s ease-in-out infinite; }
+  .dice-box.settled{ animation:diceSettle 0.4s ease; }
+  @keyframes diceWobble{
+    0%,100%{ transform:rotate(0deg) scale(1); }
+    25%{ transform:rotate(-6deg) scale(0.97); }
+    75%{ transform:rotate(6deg) scale(0.97); }
+  }
+  @keyframes diceSettle{
+    0%{ transform:scale(1.15); }
+    60%{ transform:scale(0.96); }
+    100%{ transform:scale(1); }
+  }
+
+  /* Lottery cage */
+  .lottery-cage{
+    position:relative; width:220px; height:220px; border-radius:50%;
+    background:
+      repeating-linear-gradient(0deg, transparent 0 9px, var(--line) 9px 10px),
+      repeating-linear-gradient(90deg, transparent 0 9px, var(--line) 9px 10px),
+      var(--panel-2);
+    border:4px solid var(--slate); box-shadow:var(--shadow); overflow:hidden;
+  }
+  .lottery-ball{
+    position:absolute; width:34px; height:34px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-family:'IBM Plex Mono',monospace; font-size:11px; font-weight:600; color:#fff;
+    box-shadow:0 1px 3px rgba(0,0,0,0.25); animation:ballFloat 1.1s ease-in-out infinite;
+  }
+  @keyframes ballFloat{
+    0%,100%{ transform:translate(0,0); }
+    50%{ transform:translate(var(--dx,6px), var(--dy,-8px)); }
+  }
+  .lottery-cage.mixing .lottery-ball{ animation-duration:0.35s; }
+  .lottery-chute{
+    width:90px; height:40px; margin:0 auto; border:1px solid var(--line); border-top:none;
+    border-radius:0 0 12px 12px; background:#fff; display:flex; align-items:center; justify-content:center;
+  }
+  .lottery-ball.winner-drop{
+    position:static; animation:none; margin:0 auto;
+  }
+
   @media (max-width: 760px){
     .app{ flex-direction:column; }
     .sidebar{ width:100%; height:auto; position:relative; flex-direction:row; overflow-x:auto; padding:16px; }
@@ -484,7 +595,36 @@
 </head>
 <body>
 
-<div class="app">
+<div class="auth-gate" id="authGate">
+  <div class="auth-card">
+    <div class="auth-brand">
+      <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
+        <path d="M13 3 L13 23 M13 8 Q7 10 5 15 M13 8 Q19 10 21 15 M13 13 Q8 15 6 20 M13 13 Q18 15 20 20" stroke="#EAD3A0" stroke-width="1.6" stroke-linecap="round"/>
+        <circle cx="13" cy="4.5" r="2.4" fill="#C99A3E"/>
+      </svg>
+      <div>
+        <h1>New Teacher Boot Camp</h1>
+        <p>Ceiba · Coordinator Dashboard</p>
+      </div>
+    </div>
+    <h2 id="authTitle">Sign in</h2>
+    <p class="auth-sub" id="authSub">Sign in with your coordinator account.</p>
+    <div class="field" id="authEmailField">
+      <label for="authEmail">Email</label>
+      <input type="email" id="authEmail" placeholder="you@ceiba.org" autocomplete="username">
+    </div>
+    <div class="field" id="authPasswordField">
+      <label for="authPassword" id="authPasswordLabel">Password</label>
+      <input type="password" id="authPassword" placeholder="••••••••" autocomplete="current-password">
+    </div>
+    <div class="auth-msg" id="authMsg" style="display:none;"></div>
+    <button class="btn" id="authSubmitBtn" style="width:100%;">Sign in</button>
+    <button class="auth-forgot" id="authForgotBtn">Forgot password?</button>
+    <button class="auth-toggle" id="authToggleBtn">Need an account? Create one</button>
+  </div>
+</div>
+
+<div class="app" id="appRoot" style="display:none;">
   <aside class="sidebar">
     <div class="brand">
       <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
@@ -520,6 +660,8 @@
     </nav>
     <div class="sidebar-foot">
       <div class="save-status" id="saveStatus"><span class="save-dot"></span>Loading…</div>
+      <div class="signed-in-as" id="signedInAs"></div>
+      <button class="reset-btn" id="signOutBtn">Sign out</button>
       <button class="reset-btn" id="resetBtn">Reset all data</button>
     </div>
   </aside>
@@ -562,6 +704,11 @@
       <div class="panel" style="overflow-x:auto;">
         <h3>Attendance grid</h3>
         <div id="rosterTableWrap"></div>
+      </div>
+      <div class="panel">
+        <h3>Pick someone to talk</h3>
+        <div class="week-select-row" id="pickerModeChips"></div>
+        <div id="pickerStage"></div>
       </div>
     </section>
 
@@ -1262,6 +1409,7 @@
         renderOverview();
         renderMentorTeacherOptions();
         renderPairings();
+        renderPickerStage();
       });
     });
   }
@@ -1280,7 +1428,193 @@
     renderRoster();
     renderOverview();
     renderMentorTeacherOptions();
+    renderPickerStage();
   });
+
+  // ---------- Picker (wheel / dice / lottery cage) ----------
+  const PICKER_MODES = [
+    { key:'wheel', label:'🎡 Wheel' },
+    { key:'dice', label:'🎲 Dice' },
+    { key:'lottery', label:'🎱 Lottery cage' }
+  ];
+  const BALL_COLORS = ['var(--forest)','var(--gold)','var(--slate)','var(--clay)','var(--forest-light)'];
+  let pickerMode = 'wheel';
+  let pickerBusy = false;
+
+  function firstName(name){ return (name || '').trim().split(/\s+/)[0]; }
+
+  function renderPickerModeChips(){
+    const wrap = document.getElementById('pickerModeChips');
+    wrap.innerHTML = PICKER_MODES.map(m=>
+      `<button class="week-chip ${m.key===pickerMode?'active':''}" data-picker-mode="${m.key}">${m.label}</button>`
+    ).join('');
+    wrap.querySelectorAll('[data-picker-mode]').forEach(b=>{
+      b.addEventListener('click', ()=>{
+        if(pickerBusy) return;
+        pickerMode = b.dataset.pickerMode;
+        renderPickerModeChips();
+        renderPickerStage();
+      });
+    });
+  }
+
+  function renderPickerStage(){
+    const stage = document.getElementById('pickerStage');
+    if(teachers.length === 0){
+      stage.innerHTML = '<div class="empty">Add teachers to the roster above, then pick someone to talk.</div>';
+      return;
+    }
+    if(pickerMode === 'wheel') renderWheelStage(stage);
+    else if(pickerMode === 'dice') renderDiceStage(stage);
+    else renderLotteryStage(stage);
+  }
+
+  function renderWheelStage(stage){
+    const n = teachers.length;
+    const seg = 360 / n;
+    const cx = 100, cy = 100, r = 96;
+    const toPoint = (angleDeg, radius) => {
+      const rad = angleDeg * Math.PI / 180;
+      return [cx + radius * Math.sin(rad), cy - radius * Math.cos(rad)];
+    };
+    const wedges = teachers.map((t,i)=>{
+      const a0 = i*seg, a1 = (i+1)*seg;
+      const [x0,y0] = toPoint(a0, r);
+      const [x1,y1] = toPoint(a1, r);
+      const largeArc = (a1-a0) > 180 ? 1 : 0;
+      const color = BALL_COLORS[i % BALL_COLORS.length];
+      const centerAngle = a0 + seg/2;
+      const [tx,ty] = toPoint(centerAngle, r*0.6);
+      return `<path d="M${cx},${cy} L${x0},${y0} A${r},${r} 0 ${largeArc} 1 ${x1},${y1} Z" fill="${color}" stroke="#fff" stroke-width="1.5"/>
+        <text x="${tx}" y="${ty}" fill="#fff" font-size="10" font-weight="600" font-family="Inter,sans-serif"
+          text-anchor="middle" transform="rotate(${centerAngle} ${tx} ${ty})">${escapeHtml(firstName(t.name)).slice(0,10)}</text>`;
+    }).join('');
+
+    stage.innerHTML = `
+      <div class="picker-stage">
+        <div class="wheel-outer">
+          <div class="wheel-pointer"></div>
+          <svg class="wheel-svg" id="pickerWheel" viewBox="0 0 200 200">${wedges}</svg>
+          <div class="wheel-hub"></div>
+        </div>
+        <button class="btn" id="pickerActionBtn">Spin the wheel</button>
+        <div class="picker-result" id="pickerResult"></div>
+      </div>`;
+
+    let currentRotation = 0;
+    document.getElementById('pickerActionBtn').addEventListener('click', ()=>{
+      if(pickerBusy) return;
+      pickerBusy = true;
+      const btn = document.getElementById('pickerActionBtn');
+      btn.disabled = true;
+      document.getElementById('pickerResult').innerHTML = '';
+      const winnerIdx = Math.floor(Math.random() * teachers.length);
+      const centerAngle = winnerIdx*seg + seg/2;
+      const spins = 5;
+      currentRotation += spins*360 + ((360 - centerAngle) - (currentRotation % 360) + 360) % 360;
+      const wheelEl = document.getElementById('pickerWheel');
+      wheelEl.style.transform = 'rotate(' + currentRotation + 'deg)';
+      setTimeout(()=>{
+        const winner = teachers[winnerIdx];
+        document.getElementById('pickerResult').innerHTML = '<span class="lbl">Up next</span>' + escapeHtml(winner.name);
+        btn.disabled = false;
+        pickerBusy = false;
+      }, 4100);
+    });
+  }
+
+  function renderDiceStage(stage){
+    stage.innerHTML = `
+      <div class="picker-stage">
+        <div class="dice-box" id="pickerDice"><span>🎲</span></div>
+        <button class="btn" id="pickerActionBtn">Roll the dice</button>
+        <div class="picker-result" id="pickerResult"></div>
+      </div>`;
+
+    document.getElementById('pickerActionBtn').addEventListener('click', ()=>{
+      if(pickerBusy) return;
+      pickerBusy = true;
+      const btn = document.getElementById('pickerActionBtn');
+      btn.disabled = true;
+      document.getElementById('pickerResult').innerHTML = '';
+      const dice = document.getElementById('pickerDice');
+      const label = dice.querySelector('span');
+      dice.classList.remove('settled');
+      dice.classList.add('rolling');
+      const winner = teachers[Math.floor(Math.random() * teachers.length)];
+      const delays = [60,60,70,80,90,100,120,140,170,210,260,320,400];
+      let t = 0;
+      delays.forEach((d,i)=>{
+        t += d;
+        setTimeout(()=>{
+          const showWinner = i === delays.length - 1;
+          const name = showWinner ? winner.name : teachers[Math.floor(Math.random()*teachers.length)].name;
+          label.textContent = firstName(name);
+          if(showWinner){
+            dice.classList.remove('rolling');
+            dice.classList.add('settled');
+            document.getElementById('pickerResult').innerHTML = '<span class="lbl">Up next</span>' + escapeHtml(winner.name);
+            btn.disabled = false;
+            pickerBusy = false;
+          }
+        }, t);
+      });
+    });
+  }
+
+  function renderLotteryStage(stage){
+    const n = teachers.length;
+    const cx = 110, cy = 110, radius = 78;
+    const balls = teachers.map((t,i)=>{
+      const angle = Math.random()*Math.PI*2;
+      const dist = Math.random()*radius*0.7;
+      const x = cx + Math.cos(angle)*dist - 17;
+      const y = cy + Math.sin(angle)*dist - 17;
+      const dx = (Math.random()*14+4) * (Math.random()<0.5?-1:1);
+      const dy = (Math.random()*14+4) * (Math.random()<0.5?-1:1);
+      const dur = (0.8 + Math.random()*0.8).toFixed(2);
+      const color = BALL_COLORS[i % BALL_COLORS.length];
+      const initials = firstName(t.name).slice(0,2).toUpperCase();
+      return `<div class="lottery-ball" data-ball="${t.id}" style="left:${x}px; top:${y}px; background:${color}; --dx:${dx}px; --dy:${dy}px; animation-duration:${dur}s;">${escapeHtml(initials)}</div>`;
+    }).join('');
+
+    stage.innerHTML = `
+      <div class="picker-stage">
+        <div class="lottery-cage" id="pickerCage">${balls}</div>
+        <div class="lottery-chute" id="pickerChute"></div>
+        <button class="btn" id="pickerActionBtn">Draw a ball</button>
+        <div class="picker-result" id="pickerResult"></div>
+      </div>`;
+
+    document.getElementById('pickerActionBtn').addEventListener('click', ()=>{
+      if(pickerBusy) return;
+      pickerBusy = true;
+      const btn = document.getElementById('pickerActionBtn');
+      btn.disabled = true;
+      document.getElementById('pickerResult').innerHTML = '';
+      document.getElementById('pickerChute').innerHTML = '';
+      const cage = document.getElementById('pickerCage');
+      cage.classList.add('mixing');
+      const winner = teachers[Math.floor(Math.random() * teachers.length)];
+      setTimeout(()=>{
+        cage.classList.remove('mixing');
+        cage.querySelectorAll('.lottery-ball').forEach(el=>{
+          if(el.dataset.ball === String(winner.id)){
+            const color = el.style.background;
+            const initials = el.textContent;
+            el.remove();
+            document.getElementById('pickerChute').innerHTML =
+              `<div class="lottery-ball winner-drop" style="background:${color};">${initials}</div>`;
+          } else {
+            el.style.opacity = '0.15';
+          }
+        });
+        document.getElementById('pickerResult').innerHTML = '<span class="lbl">Up next</span>' + escapeHtml(winner.name);
+        btn.disabled = false;
+        pickerBusy = false;
+      }, 2000);
+    });
+  }
 
   // ---------- Pulse ----------
   function renderPulseChips(){
@@ -1687,6 +2021,8 @@
     renderOverviewEditActions();
     renderArchivedWeeks();
     renderRoster();
+    renderPickerModeChips();
+    renderPickerStage();
     renderPulseChips();
     renderPulseStyleSelect();
     renderPulseTrend();
@@ -1701,11 +2037,147 @@
     renderResourceList();
   }
 
-  (async function init(){
-    await loadAll();
-    renderAll();
-    routeFromHash();
-  })();
+  // ---------- Auth ----------
+  let authMode = 'signin';
+  let currentUserId = null;
+
+  function setAuthMode(mode){
+    authMode = mode;
+    document.getElementById('authMsg').style.display = 'none';
+    document.getElementById('authEmailField').style.display = mode === 'recovery' ? 'none' : '';
+    document.getElementById('authPasswordField').style.display = mode === 'forgot' ? 'none' : '';
+    document.getElementById('authForgotBtn').style.display = mode === 'signin' ? '' : 'none';
+    document.getElementById('authToggleBtn').style.display = mode === 'recovery' ? 'none' : '';
+    document.getElementById('authPasswordLabel').textContent = mode === 'recovery' ? 'New password' : 'Password';
+
+    if(mode === 'signin'){
+      document.getElementById('authTitle').textContent = 'Sign in';
+      document.getElementById('authSub').textContent = 'Sign in with your coordinator account.';
+      document.getElementById('authSubmitBtn').textContent = 'Sign in';
+      document.getElementById('authToggleBtn').textContent = 'Need an account? Create one';
+    } else if(mode === 'signup'){
+      document.getElementById('authTitle').textContent = 'Create account';
+      document.getElementById('authSub').textContent = 'Any coordinator can create an account — you\'ll share the same roster, resources, and pulse data.';
+      document.getElementById('authSubmitBtn').textContent = 'Create account';
+      document.getElementById('authToggleBtn').textContent = 'Already have an account? Sign in';
+    } else if(mode === 'forgot'){
+      document.getElementById('authTitle').textContent = 'Reset your password';
+      document.getElementById('authSub').textContent = 'Enter your email and we\'ll send you a link to reset your password.';
+      document.getElementById('authSubmitBtn').textContent = 'Send reset link';
+      document.getElementById('authToggleBtn').textContent = 'Back to sign in';
+    } else if(mode === 'recovery'){
+      document.getElementById('authTitle').textContent = 'Set a new password';
+      document.getElementById('authSub').textContent = 'Choose a new password for your account.';
+      document.getElementById('authSubmitBtn').textContent = 'Update password';
+    }
+  }
+
+  function showAuthMsg(text, kind){
+    const el = document.getElementById('authMsg');
+    el.textContent = text;
+    el.className = 'auth-msg ' + kind;
+    el.style.display = '';
+  }
+
+  document.getElementById('authForgotBtn').addEventListener('click', ()=>{
+    setAuthMode('forgot');
+  });
+
+  document.getElementById('authToggleBtn').addEventListener('click', ()=>{
+    if(authMode === 'forgot'){ setAuthMode('signin'); return; }
+    setAuthMode(authMode === 'signin' ? 'signup' : 'signin');
+  });
+
+  document.getElementById('authSubmitBtn').addEventListener('click', async ()=>{
+    const email = document.getElementById('authEmail').value.trim();
+    const password = document.getElementById('authPassword').value;
+    const btn = document.getElementById('authSubmitBtn');
+
+    if(authMode === 'forgot'){
+      if(!email){ showAuthMsg('Enter your email.', 'error'); return; }
+      btn.disabled = true;
+      document.getElementById('authMsg').style.display = 'none';
+      const { error } = await sb.auth.resetPasswordForEmail(email, {
+        redirectTo: window.location.origin + window.location.pathname
+      });
+      if(error) showAuthMsg(error.message, 'error');
+      else showAuthMsg('Check your email for a link to reset your password.', 'success');
+      btn.disabled = false;
+      return;
+    }
+
+    if(authMode === 'recovery'){
+      if(!password || password.length < 6){ showAuthMsg('Enter a new password (at least 6 characters).', 'error'); return; }
+      btn.disabled = true;
+      document.getElementById('authMsg').style.display = 'none';
+      const { error } = await sb.auth.updateUser({ password });
+      if(error){ showAuthMsg(error.message, 'error'); btn.disabled = false; return; }
+      showAuthMsg('Password updated — signing you in…', 'success');
+      setTimeout(()=>{
+        history.replaceState(null, '', window.location.pathname);
+        location.reload();
+      }, 1200);
+      return;
+    }
+
+    if(!email || !password){ showAuthMsg('Enter an email and password.', 'error'); return; }
+    btn.disabled = true;
+    document.getElementById('authMsg').style.display = 'none';
+    if(authMode === 'signin'){
+      const { error } = await sb.auth.signInWithPassword({ email, password });
+      if(error) showAuthMsg(error.message, 'error');
+    } else {
+      const { data, error } = await sb.auth.signUp({ email, password });
+      if(error){
+        showAuthMsg(error.message, 'error');
+      } else if(!data.session){
+        setAuthMode('signin');
+        showAuthMsg('Account created — check your email to confirm it, then sign in.', 'success');
+      }
+    }
+    btn.disabled = false;
+  });
+
+  document.getElementById('signOutBtn').addEventListener('click', async ()=>{
+    await sb.auth.signOut();
+  });
+
+  function showApp(session){
+    document.getElementById('authGate').style.display = 'none';
+    document.getElementById('appRoot').style.display = 'flex';
+    document.getElementById('signedInAs').textContent = session.user.email;
+    loadAll().then(()=>{
+      renderAll();
+      routeFromHash();
+    });
+  }
+
+  function showAuthGate(){
+    document.getElementById('appRoot').style.display = 'none';
+    document.getElementById('authGate').style.display = 'flex';
+    document.getElementById('authEmail').value = '';
+    document.getElementById('authPassword').value = '';
+    setAuthMode('signin');
+  }
+
+  sb.auth.onAuthStateChange((event, session)=>{
+    if(event === 'PASSWORD_RECOVERY'){
+      document.getElementById('appRoot').style.display = 'none';
+      document.getElementById('authGate').style.display = 'flex';
+      document.getElementById('authEmail').value = '';
+      document.getElementById('authPassword').value = '';
+      setAuthMode('recovery');
+      return;
+    }
+    if(session){
+      if(currentUserId === session.user.id) return;
+      currentUserId = session.user.id;
+      showApp(session);
+    } else {
+      currentUserId = null;
+      showAuthGate();
+    }
+  });
 })();
 </script>
 </body>
